@@ -3,6 +3,7 @@ const ErrorMessage = {
   PRODUCT_NOT_FOUND: 'Product not found',
   USER_NOT_FOUND: 'User not found',
   TOKEN_NOT_FOUND: 'Token not found',
+  REVIEW_NOT_FOUND: 'Review not found',
 
   // Already exists
   PRODUCT_ALREADY_EXISTS: 'Product already exists',

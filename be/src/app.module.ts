@@ -14,8 +14,10 @@ import { TokenService } from './token/token.service';
 import { TokenModule } from './token/token.module';
 import { ReviewModule } from './reviews/review.module';
 import { ReviewService } from './reviews/review.service';
-
-console.log(__dirname);
+import { ProductsService } from './products/products.service';
+import { ProductsModule } from './products/products.module';
+import { ConfigModule } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config/dist';
 
 @Module({
   imports: [
@@ -23,26 +25,41 @@ console.log(__dirname);
     OrdersModule,
     AuthModule,
     ReviewModule,
+    ProductsModule,
     TokenModule,
-    MongooseModule.forRoot('mongodb://localhost/nest'),
-    MailerModule.forRoot({
-      transport: 'smtps://user@domain.com:pass@smtp.domain.com',
-      defaults: {
-        from: '"nest-modules" <modules@nestjs.com>',
-      },
-      template: {
-        dir: __dirname + '/templates',
-        adapter: new HandlebarsAdapter(),
-        options: {
-          strict: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get('MONGO_URI'),
+      }),
+    }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        transport: 'smtps://user@domain.com:pass@smtp.domain.com',
+        defaults: {
+          from: '"nest-modules" <modules@nestjs.com>',
         },
-      },
+        template: {
+          dir: __dirname + '/templates',
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
     }),
   ],
   controllers: [AppController],
   providers: [
     AppService,
     OrdersService,
+    ProductsService,
     AuthService,
     UsersService,
     TokenService,

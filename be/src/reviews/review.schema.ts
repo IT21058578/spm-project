@@ -1,19 +1,19 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
-import { AuditedModel } from "src/common/schema/audit.schema";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+import { AuditedModel } from 'src/common/schema/audit.schema';
 
 export type ReviewDocument = HydratedDocument<Review>;
 
-@Schema({collection: "reviews"})
+@Schema({ collection: 'reviews' })
 export class Review extends AuditedModel {
-    @Prop()
-    rating: number;
+  @Prop()
+  rating: number;
 
-    @Prop()
-    description: string;
+  @Prop()
+  description: string;
 
-    @Prop()
-    productId: string;
+  @Prop({ immutable: true })
+  productId: string;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

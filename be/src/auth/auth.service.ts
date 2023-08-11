@@ -1,10 +1,10 @@
-import fs from 'fs/promises';
+import { readFile } from 'fs/promises';
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import bcrypt from 'bcrypt';
 import ErrorMessage from 'src/common/constants/error-message';
 import { join } from 'path';
-import jose from 'jose';
+import { importPKCS8, importSPKI, SignJWT, KeyLike } from 'jose';
 import { LoginDto } from 'src/common/dtos/login.dto';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -19,8 +19,8 @@ import { TokenStatus } from 'src/common/constants/token-status';
 
 @Injectable()
 export class AuthService {
-  private publicKey: jose.KeyLike;
-  private privateKey: jose.KeyLike;
+  private publicKey: KeyLike;
+  private privateKey: KeyLike;
   private algorithm = 'RS256';
   private readonly logger = new Logger(AuthService.name);
 
@@ -38,7 +38,7 @@ export class AuthService {
     this.logger.log('Setting up private and public keys...');
     const [privateKey, publicKey] = await Promise.all([
       this.loadKey('./assets/certs/private-key.pem', true),
-      this.loadKey('./assets/certs/public-key.pem', true),
+      this.loadKey('./assets/certs/public-key.pem'),
     ]);
 
     this.privateKey = privateKey;
@@ -197,7 +197,7 @@ export class AuthService {
     id: string,
     kind: 'access' | 'refresh',
   ): Promise<string> {
-    return new jose.SignJWT({
+    return new SignJWT({
       sub: id,
       kind,
       exp: 100000,
@@ -205,10 +205,10 @@ export class AuthService {
   }
 
   private async loadKey(path: string, isPrivate?: boolean) {
-    const keyStr = (await fs.readFile(join(process.cwd(), path))).toString();
+    const keyStr = (await readFile(join(process.cwd(), path))).toString();
     if (isPrivate) {
-      return await jose.importPKCS8(keyStr, this.algorithm);
+      return await importPKCS8(keyStr, this.algorithm);
     }
-    return await jose.importSPKI(keyStr, this.algorithm);
+    return await importSPKI(keyStr, this.algorithm);
   }
 }

@@ -5,7 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Product, ProductDocument } from 'src/products/product.schema';
+import { Product, ProductDocument } from 'src/products/products.schema';
 import { Model } from 'mongoose';
 import { CreateProductDto } from 'src/common/dtos/create-product.dto';
 import ErrorMessage from 'src/common/constants/error-message';
@@ -14,8 +14,8 @@ import { Page, PageBuilder } from 'src/common/util/page-builder';
 import { CreateOrderDto } from 'src/common/dtos/create-order.dto';
 
 @Injectable()
-export class ProductService {
-  private readonly logger = new Logger(ProductService.name);
+export class ProductsService {
+  private readonly logger = new Logger(ProductsService.name);
 
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
