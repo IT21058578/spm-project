@@ -16,6 +16,7 @@ import { DeliveryStatus } from 'src/common/constants/delivery-status';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/constants/user-roles';
+import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('orders')
 export class OrdersController {
@@ -44,8 +45,11 @@ export class OrdersController {
   @Post()
   @Roles(UserRole.USER)
   @HttpCode(HttpStatus.CREATED)
-  async createOrders(@Body() createOrderDto: CreateOrderDto) {
-    return await this.ordersService.createOrder('', createOrderDto);
+  async createOrders(
+    @User('_id') userId: string,
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
+    return await this.ordersService.createOrder(userId, createOrderDto);
   }
 
   @Delete(':id')

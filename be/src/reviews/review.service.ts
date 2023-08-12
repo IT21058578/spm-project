@@ -14,8 +14,16 @@ export class ReviewService {
 
   constructor(@InjectModel(Review.name) private reviewModel: Model<Review>) {}
 
-  async createReview(reviewDto: CreateReviewDto): Promise<ReviewDocument> {
-    const createdReview = new this.reviewModel(reviewDto);
+  async createReview(
+    createdBy: string,
+    reviewDto: CreateReviewDto,
+  ): Promise<ReviewDocument> {
+    this.logger.log('Creating new review...');
+    const createdReview = new this.reviewModel({
+      reviewDto,
+      createdBy,
+      createdAt: new Date(),
+    });
     return await createdReview.save();
   }
 
@@ -23,34 +31,42 @@ export class ReviewService {
     id: string,
     reviewDto: UpdateReviewDto,
   ): Promise<ReviewDocument> {
+    this.logger.log(`Attempting to update review with id '${id}'`);
     const updatedReview = await this.reviewModel.findByIdAndUpdate(
       id,
       reviewDto,
     );
 
     if (updatedReview === null) {
+      this.logger.warn(`Could not find review with id '${id}'`);
       throw new BadRequestException(ErrorMessage.REVIEW_NOT_FOUND, {
         description: `Review with id '${id}' was not found`,
       });
     }
+
     return updatedReview;
   }
 
   async getReview(id: string): Promise<ReviewDocument> {
+    this.logger.log(`Attempting to find review with id '${id}'`);
     const existingReview = await this.reviewModel.findById(id);
 
     if (existingReview === null) {
+      this.logger.warn(`Could not find review with id '${id}'`);
       throw new BadRequestException(ErrorMessage.REVIEW_NOT_FOUND, {
         description: `Review with id '${id}' was not found`,
       });
     }
+
     return existingReview;
   }
 
   async deleteReview(id: string) {
-    const deletedReview = await this.reviewModel.findById(id);
+    this.logger.log(`Attempting to delete review with id '${id}'`);
+    const deletedReview = await this.reviewModel.findByIdAndDelete(id);
 
     if (deletedReview === null) {
+      this.logger.warn(`Could not find review with id '${id}'`);
       throw new BadRequestException(ErrorMessage.PRODUCT_NOT_FOUND, {
         description: `Review with id '${id}' was not found`,
       });

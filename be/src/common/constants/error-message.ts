@@ -11,6 +11,10 @@ const ErrorMessage = {
 
   // Authoriztion
   INVALID_CREDENTIALS: 'Invalid credentials',
+  INSUFFICIENT_PERMISSIONS: 'Insufficient permissions',
+  NOT_AUTHENTICATED: 'Not authenticated',
+  INVALID_TOKEN: 'Invalid token',
+  EMAIL_NOT_VERIFIEd: 'Email not verified',
 
   // Misc
   NOT_ENOUGH_STOCK: 'Not enough stock',

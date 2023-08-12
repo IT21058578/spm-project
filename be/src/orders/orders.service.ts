@@ -21,10 +21,10 @@ export class OrdersService {
   ) {}
 
   async createOrder(
-    userId: string,
+    createdBy: string,
     { items }: CreateOrderDto,
   ): Promise<OrderDocument> {
-    const existingUser = await this.userService.getUser(userId);
+    const existingUser = await this.userService.getUser(createdBy);
     const products = await Promise.all(
       Object.keys(items).map((id) => this.productService.getProduct(id)),
     );

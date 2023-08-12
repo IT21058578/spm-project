@@ -8,6 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/user-roles';
+import ErrorMessage from '../constants/error-message';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -27,9 +28,14 @@ export class RolesGuard implements CanActivate {
     }
 
     const { user } = context.switchToHttp().getRequest();
-    if (user === undefined) throw new UnauthorizedException();
-    if (!requiredRoles.some((role) => user.roles?.includes(role)))
-      throw new UnauthorizedException();
+    if (user === undefined) {
+      this.logger.warn('Could not authorize user. Not authenticated');
+      throw new UnauthorizedException(ErrorMessage.NOT_AUTHENTICATED);
+    }
+    if (!requiredRoles.some((role) => user.roles?.includes(role))) {
+      this.logger.warn('Could not authorize user. Insufficient permissions');
+      throw new UnauthorizedException(ErrorMessage.INSUFFICIENT_PERMISSIONS);
+    }
     return true;
   }
 }

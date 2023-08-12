@@ -32,6 +32,9 @@ export class TokenService {
     email: string,
     tokenPurpose: TokenPurpose,
   ) {
+    this.logger.log(
+      `Revoking all ${tokenPurpose} tokens for user with email '${email}'`,
+    );
     const revokedTokens = await this.tokenModel.find({
       email,
       tokenPurpose,
@@ -43,16 +46,20 @@ export class TokenService {
         await token.save();
       }),
     );
+    this.logger.log(
+      `Succesfully revoked all ${tokenPurpose} tokens for user with email '${email}'`,
+    );
   }
 
   private async createTokenOfPurpose(email: string, purpose: TokenPurpose) {
+    this.logger.log(`Creating '${purpose}' token for user with email ${email}`);
     const createdToken = new this.tokenModel({
       email,
       purpose,
       code: uuid(),
       tokenStatus: TokenStatus.ACTIVE,
     });
-
+    this.logger.log(`Created '${purpose}' token for user with email ${email}`);
     return await createdToken.save();
   }
 }

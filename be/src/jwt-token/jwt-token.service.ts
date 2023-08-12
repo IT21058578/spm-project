@@ -9,7 +9,7 @@ export class JwtTokenService {
   private accessPrivateKey: KeyLike;
   private refreshPublicKey: KeyLike;
   private refreshPrivateKey: KeyLike;
-  private algorithm = 'RS256';
+  private keyAlgorithm = 'RS256';
   private issuer = 'SERA';
   private readonly logger = new Logger(JwtTokenService.name);
 
@@ -38,33 +38,43 @@ export class JwtTokenService {
   }
 
   async getAccessToken(id: string): Promise<string> {
-    return new SignJWT({
-      sub: id,
-      exp: 100000,
-      iss: this.issuer,
-    }).sign(this.accessPrivateKey);
+    this.logger.log(`Creating new access token for user with id '${id}'`);
+    return new SignJWT({})
+      .setIssuedAt()
+      .setSubject(id)
+      .setIssuer(this.issuer)
+      .setExpirationTime('2h')
+      .setProtectedHeader({ alg: this.keyAlgorithm })
+      .sign(this.accessPrivateKey);
   }
 
   async getRefreshToken(id: string): Promise<string> {
-    return new SignJWT({
-      sub: id,
-      exp: 1000000,
-      iss: this.issuer,
-    }).sign(this.refreshPrivateKey);
+    this.logger.log(`Creating new refresh token for user with id '${id}'`);
+    return new SignJWT({})
+      .setIssuedAt()
+      .setSubject(id)
+      .setIssuer(this.issuer)
+      .setExpirationTime('7d')
+      .setProtectedHeader({ alg: this.keyAlgorithm })
+      .sign(this.refreshPrivateKey);
   }
 
   async verifyAccessToken(token: string): Promise<string> {
+    this.logger.log(`Verifying access token '${token}'...`);
     const { payload } = await jwtVerify(token, this.accessPublicKey, {
       issuer: this.issuer,
       requiredClaims: ['sub'],
+      algorithms: [this.keyAlgorithm],
     });
     return payload.sub!;
   }
 
   async verifyRefreshToken(token: string): Promise<string> {
+    this.logger.log(`Verifying refresh token '${token}'...`);
     const { payload } = await jwtVerify(token, this.refreshPublicKey, {
       issuer: this.issuer,
       requiredClaims: ['sub'],
+      algorithms: [this.keyAlgorithm],
     });
     return payload.sub!;
   }
@@ -72,8 +82,8 @@ export class JwtTokenService {
   private async loadKey(path: string, isPrivate?: boolean) {
     const keyStr = (await readFile(join(process.cwd(), path))).toString();
     if (isPrivate) {
-      return await importPKCS8(keyStr, this.algorithm);
+      return await importPKCS8(keyStr, this.keyAlgorithm);
     }
-    return await importSPKI(keyStr, this.algorithm);
+    return await importSPKI(keyStr, this.keyAlgorithm);
   }
 }

@@ -2,12 +2,13 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  UnauthorizedException,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtTokenService } from 'src/jwt-token/jwt-token.service';
 import { UsersService } from 'src/users/users.service';
+import ErrorMessage from '../constants/error-message';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -23,7 +24,8 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.getToken(request);
     if (!token) {
-      throw new UnauthorizedException();
+      this.logger.debug(`Could not authenticate user`);
+      return true;
     }
     try {
       const id = await this.jwtTokenService.verifyAccessToken(token);
@@ -33,7 +35,8 @@ export class AuthGuard implements CanActivate {
     } catch {
       this.logger.debug(`Could not authenticate user`);
     }
-    return true;
+    this.logger.warn(`User attempted to access resources with an invalid token`);
+    throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
   }
 
   private getToken(request: Request): string | undefined {

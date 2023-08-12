@@ -45,12 +45,21 @@ import { RolesGuard } from './common/guards/roles-guard.guard';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        transport: 'smtps://user@domain.com:pass@smtp.domain.com',
+        transport: {
+          host: configService.get('SMTP_HOST'),
+          port: 465,
+          secure: true,
+          auth: {
+            user: configService.get('SMTP_USER'),
+            pass: configService.get('SMTP_PASS'),
+          },
+          connectionTimeout: 1 * 60 * 1000,
+        },
         defaults: {
           from: '"nest-modules" <modules@nestjs.com>',
         },
         template: {
-          dir: __dirname + '/templates',
+          dir: __dirname + './../assets/templates',
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,

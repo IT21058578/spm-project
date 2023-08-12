@@ -30,12 +30,14 @@ export class ProductsService {
     id: string,
     productDto: CreateProductDto,
   ): Promise<ProductDocument> {
+    this.logger.log(`Attempting to update product with id '${id}'`);
     const updatedProduct = await this.productModel.findByIdAndUpdate(
       id,
       productDto,
     );
 
     if (updatedProduct === null) {
+      this.logger.warn(`Could not find product with id '${id}'`);
       throw new BadRequestException(ErrorMessage.PRODUCT_NOT_FOUND, {
         description: `Product with id '${id}' was not found`,
       });
@@ -44,9 +46,11 @@ export class ProductsService {
   }
 
   async getProduct(id: string): Promise<ProductDocument> {
+    this.logger.log(`Attempting to find product with id '${id}'`);
     const existingProduct = await this.productModel.findById(id);
 
     if (existingProduct === null) {
+      this.logger.warn(`Could not find product with id '${id}'`);
       throw new BadRequestException(ErrorMessage.PRODUCT_NOT_FOUND, {
         description: `Product with id '${id}' was not found`,
       });
@@ -55,9 +59,11 @@ export class ProductsService {
   }
 
   async deleteProduct(id: string) {
+    this.logger.log(`Attempting to delete product with id '${id}'`);
     const deletedProduct = await this.productModel.findById(id);
 
     if (deletedProduct === null) {
+      this.logger.warn(`Could not find product with id '${id}'`);
       throw new BadRequestException(ErrorMessage.PRODUCT_NOT_FOUND, {
         description: `Product with id '${id}' was not found`,
       });
@@ -71,6 +77,7 @@ export class ProductsService {
     pageSize,
     sort,
   }: PageRequest): Promise<Page<ProductDocument>> {
+    this.logger.log(`Attempting to create product page...`);
     const skippedDocuments = (pageNum - 1) * pageSize;
     const [totalDocuments, products] = await Promise.all([
       this.productModel.count({}),
@@ -96,16 +103,17 @@ export class ProductsService {
   }
 
   async adjustMultipleProductStock({ items }: CreateOrderDto) {
+    this.logger.log(`Attempting to adjust product(s) stock counts...`);
     const products = await Promise.all(
       Object.entries(items).map(async ([id, qty]) => {
         const product = await this.getProduct(id);
         product.countInStock -= qty;
 
         if (product.countInStock < 0) {
-          throw new ConflictException(
-            ErrorMessage.NOT_ENOUGH_STOCK,
-            `Product with id ${id} does not have enough stock for this purchase`,
+          this.logger.warn(
+            `Product with id '${id}' deos not have enough stock for this purchase`,
           );
+          throw new ConflictException(ErrorMessage.NOT_ENOUGH_STOCK);
         }
 
         return product;
@@ -113,5 +121,6 @@ export class ProductsService {
     );
 
     await Promise.all(products.map((product) => product.save()));
+    this.logger.log(`Succesfully updated all relevant product(s) stock counts`);
   }
 }

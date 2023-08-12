@@ -15,6 +15,7 @@ import { ReviewService } from './review.service';
 import { UpdateReviewDto } from 'src/common/dtos/update-review-dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/constants/user-roles';
+import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -42,8 +43,11 @@ export class ReviewsController {
   @Post()
   @Roles(UserRole.USER)
   @HttpCode(HttpStatus.CREATED)
-  async createReview(@Body() createReviewDto: CreateReviewDto) {
-    return await this.reviewService.createReview(createReviewDto);
+  async createReview(
+    @User('_id') userId: string,
+    @Body() createReviewDto: CreateReviewDto,
+  ) {
+    return await this.reviewService.createReview(userId, createReviewDto);
   }
 
   @Delete(':id')
