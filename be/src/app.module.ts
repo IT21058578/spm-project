@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { OrdersService } from './orders/orders.service';
 import { OrdersModule } from './orders/orders.module';
@@ -18,6 +16,11 @@ import { ProductsService } from './products/products.service';
 import { ProductsModule } from './products/products.module';
 import { ConfigModule } from '@nestjs/config';
 import { ConfigService } from '@nestjs/config/dist';
+import { JwtTokenModule } from './jwt-token/jwt-token.module';
+import { JwtTokenService } from './jwt-token/jwt-token.service';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './common/guards/auth-guard.guard';
+import { RolesGuard } from './common/guards/roles-guard.guard';
 
 @Module({
   imports: [
@@ -27,6 +30,7 @@ import { ConfigService } from '@nestjs/config/dist';
     ReviewModule,
     ProductsModule,
     TokenModule,
+    JwtTokenModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -55,15 +59,22 @@ import { ConfigService } from '@nestjs/config/dist';
       }),
     }),
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     OrdersService,
     ProductsService,
     AuthService,
     UsersService,
     TokenService,
     ReviewService,
+    JwtTokenService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {}

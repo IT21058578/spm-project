@@ -1,10 +1,7 @@
-import { readFile } from 'fs/promises';
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import bcrypt from 'bcrypt';
 import ErrorMessage from 'src/common/constants/error-message';
-import { join } from 'path';
-import { importPKCS8, importSPKI, SignJWT, KeyLike } from 'jose';
 import { LoginDto } from 'src/common/dtos/login.dto';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -16,35 +13,20 @@ import { TokenService } from 'src/token/token.service';
 import { Token } from 'src/token/token.schema';
 import { TokenPurpose } from 'src/common/constants/token-purpose';
 import { TokenStatus } from 'src/common/constants/token-status';
+import { JwtTokenService } from 'src/jwt-token/jwt-token.service';
 
 @Injectable()
 export class AuthService {
-  private publicKey: KeyLike;
-  private privateKey: KeyLike;
-  private algorithm = 'RS256';
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
     private readonly mailerService: MailerService,
+    private readonly jwtTokenService: JwtTokenService,
     @InjectModel(Token.name) private readonly tokenModel: Model<Token>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
-  ) {
-    this.setup();
-  }
-
-  private async setup() {
-    this.logger.log('Setting up private and public keys...');
-    const [privateKey, publicKey] = await Promise.all([
-      this.loadKey('./assets/certs/private-key.pem', true),
-      this.loadKey('./assets/certs/public-key.pem'),
-    ]);
-
-    this.privateKey = privateKey;
-    this.publicKey = publicKey;
-    this.logger.log('Finished setting up private and public keys');
-  }
+  ) {}
 
   async loginUser(email: string, password: string): Promise<LoginDto> {
     try {
@@ -59,8 +41,8 @@ export class AuthService {
       }
 
       const [accessToken, refreshToken] = await Promise.all([
-        this.getJwt(existingUser.id, 'access'),
-        this.getJwt(existingUser.id, 'refresh'),
+        this.jwtTokenService.getAccessToken(existingUser.id),
+        this.jwtTokenService.getRefreshToken(existingUser.id),
       ]);
 
       const { password: userPassword, ...sanitizedUser } = existingUser;
@@ -177,7 +159,7 @@ export class AuthService {
       }
 
       const isPasswordsMatching = await bcrypt.compare(
-        password,
+        oldPassword,
         existingUser.password,
       );
 
@@ -191,24 +173,5 @@ export class AuthService {
     } catch (error) {
       throw new BadRequestException(ErrorMessage.INVALID_CREDENTIALS);
     }
-  }
-
-  private async getJwt(
-    id: string,
-    kind: 'access' | 'refresh',
-  ): Promise<string> {
-    return new SignJWT({
-      sub: id,
-      kind,
-      exp: 100000,
-    }).sign(this.privateKey);
-  }
-
-  private async loadKey(path: string, isPrivate?: boolean) {
-    const keyStr = (await readFile(join(process.cwd(), path))).toString();
-    if (isPrivate) {
-      return await importPKCS8(keyStr, this.algorithm);
-    }
-    return await importSPKI(keyStr, this.algorithm);
   }
 }

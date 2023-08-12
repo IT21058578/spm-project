@@ -13,6 +13,8 @@ import { CreateReviewDto } from 'src/common/dtos/create-review-dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { ReviewService } from './review.service';
 import { UpdateReviewDto } from 'src/common/dtos/update-review-dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/common/constants/user-roles';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -29,6 +31,7 @@ export class ReviewsController {
   }
 
   @Put(':id')
+  @Roles(UserRole.USER)
   async editReview(
     @Param('id') id: string,
     @Body() updateReviewDto: UpdateReviewDto,
@@ -37,12 +40,14 @@ export class ReviewsController {
   }
 
   @Post()
+  @Roles(UserRole.USER)
   @HttpCode(HttpStatus.CREATED)
   async createReview(@Body() createReviewDto: CreateReviewDto) {
     return await this.reviewService.createReview(createReviewDto);
   }
 
   @Delete(':id')
+  @Roles(UserRole.USER)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteReview(@Param('id') id: string) {
     await this.reviewService.deleteReview(id);

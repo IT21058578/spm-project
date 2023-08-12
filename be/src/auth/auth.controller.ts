@@ -14,6 +14,8 @@ import { AuthService } from './auth.service';
 import { AuthorizeRequestDto } from 'src/common/dtos/authorize-request.dto';
 import { ResetPasswordRequestDto } from 'src/common/dtos/reset-password-request.dto';
 import { ChangePasswordRequestDto } from 'src/common/dtos/change-password-request.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/common/constants/user-roles';
 
 @Controller('auth')
 export class AuthController {
@@ -55,6 +57,7 @@ export class AuthController {
   }
 
   @Put('password/change')
+  @Roles(UserRole.USER)
   async changeUserPassword(
     @Body() { email, password, oldPassword }: ChangePasswordRequestDto,
   ) {
