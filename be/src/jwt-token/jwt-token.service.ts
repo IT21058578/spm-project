@@ -9,8 +9,8 @@ export class JwtTokenService {
   private accessPrivateKey: KeyLike;
   private refreshPublicKey: KeyLike;
   private refreshPrivateKey: KeyLike;
-  private keyAlgorithm = 'RS256';
-  private issuer = 'SERA';
+  private readonly keyAlgorithm = 'RS256';
+  private readonly issuer = 'SERA';
   private readonly logger = new Logger(JwtTokenService.name);
 
   constructor() {

@@ -12,7 +12,7 @@ import { UpdateReviewDto } from 'src/common/dtos/update-review-dto';
 export class ReviewService {
   private readonly logger = new Logger(ReviewService.name);
 
-  constructor(@InjectModel(Review.name) private reviewModel: Model<Review>) {}
+  constructor(@InjectModel(Review.name) private readonly reviewModel: Model<Review>) {}
 
   async createReview(
     createdBy: string,

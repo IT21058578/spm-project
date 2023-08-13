@@ -21,6 +21,8 @@ import { JwtTokenService } from './jwt-token/jwt-token.service';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guards/auth-guard.guard';
 import { RolesGuard } from './common/guards/roles-guard.guard';
+import { EmailModule } from './email/email.module';
+import { EmailService } from './email/email.service';
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import { RolesGuard } from './common/guards/roles-guard.guard';
     ProductsModule,
     TokenModule,
     JwtTokenModule,
+    EmailModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -76,6 +79,7 @@ import { RolesGuard } from './common/guards/roles-guard.guard';
     TokenService,
     ReviewService,
     JwtTokenService,
+    EmailService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

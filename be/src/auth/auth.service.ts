@@ -8,12 +8,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/user.schema';
 import { Model } from 'mongoose';
 import { UserRole } from 'src/common/constants/user-roles';
-import { MailerService } from '@nestjs-modules/mailer';
 import { TokenService } from 'src/token/token.service';
-import { Token } from 'src/token/token.schema';
 import { TokenPurpose } from 'src/common/constants/token-purpose';
-import { TokenStatus } from 'src/common/constants/token-status';
 import { JwtTokenService } from 'src/jwt-token/jwt-token.service';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -22,9 +20,8 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
-    private readonly mailerService: MailerService,
+    private readonly emailService: EmailService,
     private readonly jwtTokenService: JwtTokenService,
-    @InjectModel(Token.name) private readonly tokenModel: Model<Token>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
@@ -78,58 +75,32 @@ export class AuthService {
     createdUser.password = await hash(createdUser.password, 10);
     createdUser.isAuthorized = false;
     const savedUser = await createdUser.save();
-
     this.sendRegistrationMail(userDto.email);
-
     return savedUser;
   }
 
   async sendRegistrationMail(email: string) {
     await this.tokenService.revokeAllActiveSignUpTokens(email);
     const token = await this.tokenService.createSignUpToken(email);
-
-    this.mailerService
-      .sendMail({
-        to: email,
-        from: 'noreply@sera.com',
-        subject: 'Sera - Complete your registration',
-        text: `Your registration code is ${token.code}`,
-        template: 'registration',
-      })
-      .then(() => {
-        this.logger.log(
-          `Successfully sent registration email to user with email ${email}`,
-        );
-      })
-      .catch((err) => {
-        this.logger.warn(
-          `Could not send registration email to user with email '${email}'`,
-        );
-        console.log(err);
-      });
+    this.emailService.sendMail(email, TokenPurpose.SIGN_UP, {
+      token: token.code,
+    });
   }
 
   async authorizeUser(tokenCode: string) {
-    const token = await this.tokenModel.findOne({
-      code: tokenCode,
-      purpose: TokenPurpose.SIGN_UP,
-    });
-
-    if (token === null) {
-      this.logger.warn(`Could not find token with code '${tokenCode}'`);
-      throw new BadRequestException(ErrorMessage.TOKEN_NOT_FOUND);
-    }
-
-    const existingUser = await this.userModel.findOne({ email: token.email });
+    const { email } = await this.tokenService.claimToken(
+      tokenCode,
+      TokenPurpose.SIGN_UP,
+    );
+    const existingUser = await this.userModel.findOne({ email });
     if (existingUser == null) {
-      this.logger.warn(`Could not find user with email '${token.email}'`);
+      this.logger.warn(`Could not find user with email '${email}'`);
       throw new BadRequestException(ErrorMessage.USER_NOT_FOUND);
     }
 
     existingUser.isAuthorized = true;
-    token.tokenStatus = TokenStatus.REVOKED;
-
-    await Promise.all([token.save(), existingUser.save()]);
+    const savedUser = await existingUser.save();
+    return savedUser.toJSON();
   }
 
   async forgotUserPassword(email: string) {
@@ -144,39 +115,25 @@ export class AuthService {
 
     await this.tokenService.revokeAllActiveResetPasswordTokens(email);
     const token = await this.tokenService.createResetPasswordToken(email);
-
-    this.mailerService
-      .sendMail({
-        to: email,
-        from: 'noreply@sera.com',
-        subject: 'Sera - Reset your password',
-        text: `Your password reset code is ${token.code}`,
-      })
-      .catch(() => {
-        this.logger.warn(
-          `Could not send forgot user email to user with email '${email}'`,
-        );
-      });
+    this.emailService.sendMail(email, TokenPurpose.RESET_PASSWORD, {
+      token: token.code,
+    });
   }
 
   async resetUserPassword(password: string, tokenCode: string) {
-    const token = await this.tokenModel.findOne({
-      code: tokenCode,
-      purpose: TokenPurpose.RESET_PASSWORD,
-    });
-    if (token === null) {
-      throw new BadRequestException(ErrorMessage.TOKEN_NOT_FOUND);
-    }
-
-    const existingUser = await this.userModel.findOne({ email: token.email });
+    const { email } = await this.tokenService.claimToken(
+      tokenCode,
+      TokenPurpose.SIGN_UP,
+    );
+    const existingUser = await this.userModel.findOne({ email });
     if (existingUser === null) {
+      this.logger.warn(`Could not find user with email '${email}'`);
       return;
     }
 
     existingUser.password = await hash(password, 10);
-    token.tokenStatus = TokenStatus.REVOKED;
-
-    await Promise.all([token.save(), existingUser.save()]);
+    const savedUser = await existingUser.save();
+    return savedUser.toJSON();
   }
 
   async changeUserPassword(

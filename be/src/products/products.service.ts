@@ -18,7 +18,7 @@ export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
 
   constructor(
-    @InjectModel(Product.name) private productModel: Model<Product>,
+    @InjectModel(Product.name) private readonly productModel: Model<Product>,
   ) {}
 
   async createProduct(productDto: CreateProductDto): Promise<ProductDocument> {
