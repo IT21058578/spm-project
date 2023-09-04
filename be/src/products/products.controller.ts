@@ -14,6 +14,9 @@ import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { CreateProductDto } from 'src/common/dtos/create-product.dto';
 import { UserRole } from 'src/common/constants/user-roles';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { GetRecommendationsDto } from 'src/common/dtos/get-recommendations-request.dto';
+import { Page } from 'src/common/util/page-builder';
+import { ProductDocument } from './products.schema';
 
 @Controller('products')
 export class ProductsController {
@@ -50,5 +53,12 @@ export class ProductsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteProduct(@Param('id') id: string) {
     await this.productsService.deleteProduct(id);
+  }
+
+  @Post('/recommendations')
+  async getRecommendations(
+    @Body() getRecommendationsDto: GetRecommendationsDto,
+  ): Page<ProductDocument> {
+    return await this.productsService.getRecommendations(getRecommendationsDto);
   }
 }

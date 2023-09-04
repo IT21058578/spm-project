@@ -4,6 +4,7 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductDocument } from 'src/products/products.schema';
 import { Model } from 'mongoose';
@@ -12,13 +13,21 @@ import ErrorMessage from 'src/common/constants/error-message';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { Page, PageBuilder } from 'src/common/util/page-builder';
 import { CreateOrderDto } from 'src/common/dtos/create-order.dto';
+import { GetRecommendationsDto } from 'src/common/dtos/get-recommendations-request.dto';
+import { Order } from 'src/orders/order.schema';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { ConfigKey } from 'src/common/constants/config-key';
 
 @Injectable()
 export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
 
   constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
+    @InjectModel(Order.name) private readonly orderModel: Model<Order>,
   ) {}
 
   async createProduct(productDto: CreateProductDto): Promise<ProductDocument> {
@@ -122,5 +131,33 @@ export class ProductsService {
 
     await Promise.all(products.map((product) => product.save()));
     this.logger.log(`Succesfully updated all relevant product(s) stock counts`);
+  }
+
+  async getRecommendations(
+    getRecommendationsDto: GetRecommendationsDto,
+  ): Promise<Page<ProductDocument>> {
+    this.logger.log(`Getting recommended products...`);
+    const recommendedProducts = (
+      await firstValueFrom(
+        this.httpService.post<ProductDocument[]>(
+          `${this.configService.get(
+            ConfigKey.FLASK_URL,
+          )}/api/products/recommendations`,
+          getRecommendationsDto,
+        ),
+      )
+    ).data;
+
+    this.logger.log(`Found recommended products`);
+    const totalDocuments = await this.productModel.count({});
+    const { pageNum, pageSize } = getRecommendationsDto.metadata;
+
+    const productPage = PageBuilder.buildPage(recommendedProducts, {
+      pageNum,
+      pageSize,
+      totalDocuments,
+    });
+
+    return productPage;
   }
 }
