@@ -73,8 +73,8 @@ export class UsersService {
   }
 
   async getUserPage({
-    pageNum,
-    pageSize,
+    pageNum = 1,
+    pageSize = 10,
     sort,
   }: PageRequest): Promise<Page<FlattenMaps<User & { _id: Types.ObjectId }>>> {
     const skippedDocuments = (pageNum - 1) * pageSize;
@@ -105,8 +105,9 @@ export class UsersService {
     return userPage;
   }
 
-  async downloaUsersReport() {
-    const users = await this.userModel.find({});
-    return await this.reportsService.generateReport('USER', users);
+  async downloadUsersReport() {
+    // Handlebars complains if we dont transform first.
+    const users = (await this.userModel.find({})).map((item) => item.toJSON());
+    return await this.reportsService.generateReport('USER', { users });
   }
 }

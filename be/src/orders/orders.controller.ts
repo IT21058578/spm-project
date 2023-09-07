@@ -24,15 +24,37 @@ import { User } from 'src/common/decorators/user.decorator';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @Get('search')
+  async getOrdersPage(@Body() pageRequest: PageRequest) {
+    return await this.ordersService.getOrdersPage(pageRequest);
+  }
+
+  @Get('reports')
+  // @Roles(UserRole.ADMIN)
+  @Header('Content-Type', 'application/pdf')
+  @Header(
+    'Content-Disposition',
+    'attachment; filename="Sera - Orders Report.pdf"',
+  )
+  async downloadOrdersReport(
+    @Query('user-id') userId: string,
+  ): Promise<StreamableFile> {
+    const file = await this.ordersService.downloadOrdersReport(userId);
+    return file;
+  }
+
   @Get(':id')
   @Roles(UserRole.USER)
   async getOrder(@Param('id') id: string) {
     return await this.ordersService.getOrder(id);
   }
 
-  @Get('search')
-  async getOrdersPage(@Body() pageRequest: PageRequest) {
-    return await this.ordersService.getOrdersPage(pageRequest);
+  @Delete(':id')
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteOrders(@Param('id') id: string) {
+    await this.ordersService.deleteOrder(id);
+    return;
   }
 
   @Put(':id')
@@ -52,27 +74,5 @@ export class OrdersController {
     @Body() createOrderDto: CreateOrderDto,
   ) {
     return await this.ordersService.createOrder(userId, createOrderDto);
-  }
-
-  @Delete(':id')
-  @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteOrders(@Param('id') id: string) {
-    await this.ordersService.deleteOrder(id);
-    return;
-  }
-
-  @Get('reports')
-  @Roles(UserRole.ADMIN)
-  @Header('Content-Type', 'application/pdf')
-  @Header(
-    'Content-Disposition',
-    'attachment; filename="Sera - Orders Report.pdf"',
-  )
-  async downloadOrdersReport(
-    @Query('user-id') userId: string,
-  ): Promise<StreamableFile> {
-    const file = await this.ordersService.downloaOrdersReport(userId);
-    return file;
   }
 }

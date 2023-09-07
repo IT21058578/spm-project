@@ -84,8 +84,8 @@ export class OrdersService {
   }
 
   async getOrdersPage({
-    pageNum,
-    pageSize,
+    pageNum = 1,
+    pageSize = 10,
     sort,
   }: PageRequest): Promise<Page<OrderDocument>> {
     const skippedDocuments = (pageNum - 1) * pageSize;
@@ -112,10 +112,13 @@ export class OrdersService {
     return orderPage;
   }
 
-  async downloaOrdersReport(userId?: string) {
-    const orders = await this.orderModel.find({
-      ...(userId ? { createdBy: userId } : {}),
-    });
-    return await this.reportsService.generateReport('ORDER', orders);
+  async downloadOrdersReport(userId?: string) {
+    // Handlebars complains if we dont transform first.
+    const orders = (
+      await this.orderModel.find({
+        ...(userId ? { createdBy: userId } : {}),
+      })
+    ).map((item) => item.toJSON());
+    return await this.reportsService.generateReport('ORDER', { orders });
   }
 }

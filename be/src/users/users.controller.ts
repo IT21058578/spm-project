@@ -1,22 +1,24 @@
-import { Controller, Get, Header, StreamableFile } from '@nestjs/common';
-import { UserRole } from 'src/common/constants/user-roles';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import {
+  Controller,
+  Get,
+  Header,
+  StreamableFile,
+  Param,
+  Body,
+  Post,
+} from '@nestjs/common';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UsersService } from './users.service';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/common/constants/user-roles';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':id')
-  async getUser(id: string) {
-    const { password, ...user } = await this.usersService.getUser(id)
-    return user;
-  }
-
-  @Get('search')
-  async getUsersPage(pageRequest: PageRequest) {
-    return await this.usersService.getUserPage(pageRequest)
+  @Post('search')
+  async getUsersPage(@Body() pageRequest: PageRequest) {
+    return await this.usersService.getUserPage(pageRequest);
   }
 
   @Get('reports')
@@ -26,8 +28,14 @@ export class UsersController {
     'Content-Disposition',
     'attachment; filename="Sera - Users Report.pdf"',
   )
-  async downloadOrdersReport(): Promise<StreamableFile> {
-    const file = await this.usersService.downloaUsersReport();
+  async downloadUsersReport(): Promise<StreamableFile> {
+    const file = await this.usersService.downloadUsersReport();
     return file;
+  }
+
+  @Get(':id')
+  async getUser(@Param('id') id: string) {
+    const { password, ...user } = await this.usersService.getUser(id);
+    return user;
   }
 }

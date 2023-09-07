@@ -19,7 +19,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { ConfigKey } from 'src/common/constants/config-key';
 import { ReportsService } from 'src/reports/reports.service';
-import { ReportPurpose } from 'src/common/constants/report-purpose';
+import { FileService } from 'src/file/file.service';
 
 @Injectable()
 export class ProductsService {
@@ -29,6 +29,7 @@ export class ProductsService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly reportsService: ReportsService,
+    private readonly filesService: FileService,
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
   ) {}
@@ -85,8 +86,8 @@ export class ProductsService {
   }
 
   async getProductPage({
-    pageNum,
-    pageSize,
+    pageNum = 1,
+    pageSize = 10,
     sort,
   }: PageRequest): Promise<Page<ProductDocument>> {
     this.logger.log(`Attempting to create product page...`);
@@ -165,9 +166,16 @@ export class ProductsService {
   }
 
   async downloaProductsReport(type?: string) {
-    const products = await this.productModel.find({
-      ...(type ? { type: type } : {}),
-    });
-    return await this.reportsService.generateReport('PRODUCT', products);
+    // Handlebars complains if we dont transform first.
+    const products = (
+      await this.productModel.find({
+        ...(type ? { type: type } : {}),
+      })
+    ).map((item) => item.toJSON());
+    return await this.reportsService.generateReport('PRODUCT', { products });
+  }
+
+  async uploadProductsImage(file: Express.Multer.File) {
+    return await this.filesService.uploadFile('PRODUCT_IMAGE', file);
   }
 }

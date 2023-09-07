@@ -12,7 +12,8 @@ export class Order extends AuditedModel {
 
   @Prop({ type: Map, of: Map })
   items: {
-    [productId: string]: {
+      [productId: string]: {
+      
       price: number;
       qty: number;
     };

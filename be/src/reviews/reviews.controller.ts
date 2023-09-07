@@ -21,11 +21,6 @@ import { User } from 'src/common/decorators/user.decorator';
 export class ReviewsController {
   constructor(private readonly reviewService: ReviewService) {}
 
-  @Get(':id')
-  async getReview(@Param('id') id: string) {
-    return await this.reviewService.getReview(id);
-  }
-
   @Get('search')
   async getReviewsPage(@Body() pageRequest: PageRequest) {
     return await this.reviewService.getReviewPage(pageRequest);
@@ -40,6 +35,18 @@ export class ReviewsController {
     return await this.reviewService.updateReview(id, updateReviewDto);
   }
 
+  @Delete(':id')
+  @Roles(UserRole.USER)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteReview(@Param('id') id: string) {
+    await this.reviewService.deleteReview(id);
+  }
+
+  @Get(':id')
+  async getReview(@Param('id') id: string) {
+    return await this.reviewService.getReview(id);
+  }
+
   @Post()
   @Roles(UserRole.USER)
   @HttpCode(HttpStatus.CREATED)
@@ -48,12 +55,5 @@ export class ReviewsController {
     @Body() createReviewDto: CreateReviewDto,
   ) {
     return await this.reviewService.createReview(userId, createReviewDto);
-  }
-
-  @Delete(':id')
-  @Roles(UserRole.USER)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteReview(@Param('id') id: string) {
-    await this.reviewService.deleteReview(id);
   }
 }

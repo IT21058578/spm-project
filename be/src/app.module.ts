@@ -54,9 +54,11 @@ import { PDFModule } from '@t00nday/nestjs-pdf';
       view: {
         root: __dirname + './../assets/templates',
         engine: 'handlebars',
+        extension: 'hbs',
       },
     }),
-    FileModule.registerAsync({
+    FileModule.forRootAsync({
+      isGlobal: true,
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({

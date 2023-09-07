@@ -109,6 +109,7 @@ def adjustTagWeights(product: Dict, tagList: np.ndarray, weight: int) -> None:
             if (tag in TAG_IDX_MAP):
                 tagList[TAG_IDX_MAP[tag]] += weight
 
+
 def getPredictedTagWeights(counts):
     predicted_clust = MODEL.predict([counts])[0]
     return CLUST_DATA['cluster_weights'][predicted_clust]

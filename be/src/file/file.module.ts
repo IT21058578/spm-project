@@ -4,6 +4,6 @@ import { ConfigurableModuleClass } from './file.module-definition';
 
 @Module({
   providers: [FileService],
-  exports: [FileService]
+  exports: [FileService],
 })
-export class FileModule extends ConfigurableModuleClass{}
+export class FileModule extends ConfigurableModuleClass {}

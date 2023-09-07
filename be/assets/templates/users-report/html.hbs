@@ -1,0 +1,33 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Sera - Users Report</title>
+  </head>
+  <body>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th rowspan='1'>User ID</th>
+            <th rowspan='1'>Name</th>
+            <th rowspan='1'>Email</th>
+            <th rowspan='1'>Country</th>
+            <th rowspan='1'>Region</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each users}}
+            <tr>
+              <td>{{this._id}}</td>
+              <td>{{this.firstName}} {{this.lastName}}</td>
+              <td>{{this.email}}</td>
+              <td>{{this.country}}</td>
+              <td>{{this.region}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

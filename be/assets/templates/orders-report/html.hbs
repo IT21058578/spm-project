@@ -1,0 +1,31 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Seta - Orders Report</title>
+  </head>
+  <body>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th rowspan='1'>Order ID</th>
+            <th rowspan='1'>User ID</th>
+            <th rowspan='1'>Total Price</th>
+            <th rowspan='1'>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each orders}}
+            <tr>
+              <td>{{this._id}}</td>
+              <td>{{this.createdBy}}</td>
+              <td>{{this.totalPrice}}</td>
+              <td>{{this.deliveryStatus}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

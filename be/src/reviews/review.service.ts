@@ -12,7 +12,9 @@ import { UpdateReviewDto } from 'src/common/dtos/update-review-dto';
 export class ReviewService {
   private readonly logger = new Logger(ReviewService.name);
 
-  constructor(@InjectModel(Review.name) private readonly reviewModel: Model<Review>) {}
+  constructor(
+    @InjectModel(Review.name) private readonly reviewModel: Model<Review>,
+  ) {}
 
   async createReview(
     createdBy: string,
@@ -76,8 +78,8 @@ export class ReviewService {
   }
 
   async getReviewPage({
-    pageNum,
-    pageSize,
+    pageNum = 1,
+    pageSize = 10,
     sort,
   }: PageRequest): Promise<Page<ReviewDocument>> {
     const skippedDocuments = (pageNum - 1) * pageSize;

@@ -12,7 +12,9 @@ export class ReportsService {
   async generateReport(purpose: ReportPurpose, data: any) {
     this.logger.log('Generating report...');
     const buffer = await firstValueFrom(
-      this.pdfService.toBuffer(ReportPurpose[purpose].template, {locals: data}),
+      this.pdfService.toBuffer(ReportPurpose[purpose].template, {
+        locals: data,
+      }),
     );
     return new StreamableFile(buffer);
   }

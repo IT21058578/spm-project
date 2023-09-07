@@ -11,7 +11,6 @@ import { initializeApp } from 'firebase/app';
 import {
   FirebaseStorage,
   UploadMetadata,
-  UploadResult,
   deleteObject,
   getDownloadURL,
   getStorage,
@@ -39,25 +38,20 @@ export class FileService {
     this.firebaseStorage = getStorage(app);
   }
 
-  async uploadFile(type: DocumentType, file: File): Promise<UploadResult> {
+  async uploadFile(type: DocumentType, file: Express.Multer.File) {
     this.logger.log(`Attempting to upload a new ${type} file...`);
     const path = `${type}/${uuid()}.file`;
     const reference = ref(this.firebaseStorage, path);
     const metadata: UploadMetadata = {
-      contentType: file.type,
+      contentType: file.mimetype,
     };
 
     try {
-      const uploadResult = await uploadBytes(reference, file, metadata);
+      const uploadResult = await uploadBytes(reference, file.buffer, metadata);
       this.logger.log(`Succesfully uploaded new ${type} file`);
       return uploadResult;
     } catch (error) {
-      const errorCode = error?.code as string;
-      switch (errorCode) {
-        // TODO: Granularly handle errors
-        default:
-          throw new InternalServerErrorException(error);
-      }
+      this.handleFirebaseError(error);
     }
   }
 
