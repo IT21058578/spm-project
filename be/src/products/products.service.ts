@@ -141,22 +141,29 @@ export class ProductsService {
     getRecommendationsDto: GetRecommendationsDto,
   ): Promise<Page<ProductDocument>> {
     this.logger.log(`Getting recommended products...`);
-    const recommendedProducts = (
+    const recommendedProductsIds = (
       await firstValueFrom(
         this.httpService.post<ProductDocument[]>(
           `${this.configService.get(
             ConfigKey.FLASK_URL,
-          )}/api/products/recommendations`,
+          )}/products/recommendations`,
           getRecommendationsDto,
         ),
       )
     ).data;
 
+    const products = await this.productModel.find({
+      _id: recommendedProductsIds,
+    });
+
     this.logger.log(`Found recommended products`);
     const totalDocuments = await this.productModel.count({});
-    const { pageNum, pageSize } = getRecommendationsDto.metadata;
+    const { pageNum, pageSize } = getRecommendationsDto?.metadata ?? {
+      pageNum: 1,
+      pageSize: 5,
+    };
 
-    const productPage = PageBuilder.buildPage(recommendedProducts, {
+    const productPage = PageBuilder.buildPage(products, {
       pageNum,
       pageSize,
       totalDocuments,
@@ -165,7 +172,7 @@ export class ProductsService {
     return productPage;
   }
 
-  async downloaProductsReport(type?: string) {
+  async downloadProductsReport(type?: string) {
     // Handlebars complains if we dont transform first.
     const products = (
       await this.productModel.find({

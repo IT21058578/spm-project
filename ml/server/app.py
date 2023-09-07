@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import pickle as pkl
 
+from bson import ObjectId
 from sklearn.pipeline import Pipeline
 from typing import List, Dict
 from flask import Flask, request
@@ -18,15 +19,16 @@ load_dotenv()
 # Load env variables and others
 MONGO_URI = os.getenv('MONGO_URI')
 DB_NAME = os.getenv('DB_NAME')
-TAG_IDX_MAP = json.load(open('./product-idx-map.json'))
+TAG_IDX_MAP = json.load(
+    open(os.path.join(os.getcwd(), 'server', 'product-idx-map.json')))
 
 # Loading model
-file = open("model.pkl", "rb")
+file = open(os.path.join(os.getcwd(), 'server', 'model.pkl'), "rb")
 MODEL: Pipeline = pkl.load(file)
 file.close()
 
 # Loading additional ata
-file = open('data.pkl', 'rb')
+file = open(os.path.join(os.getcwd(), 'server', 'data.pkl'), 'rb')
 CLUST_DATA: Dict = pkl.load(file)
 file.close()
 
@@ -39,30 +41,34 @@ products_coll = db['products']
 orders_coll = db['orders']
 
 
-@app.route("/api/product/recommendations", methods=['POST'])
+@app.route("/products/recommendations", methods=['POST'])
 def getRecommendations():
-    userId, cartProductIds, currentProductId, metadata = itemgetter(
-        'userId', 'cartProductIds', 'currentProductId', 'metadata')(request.json)
+    userId = request.json.get('userId')
+    cartProductIds = request.json.get('cartProductIds')
+    currentProductId = request.json.get('currentProductId')
+    metadata = request.json.get('metadata')
 
     # Start building list of things to not recommend
     excludedProductIds = np.array([])
-    userTagCounts = [0] * len(TAG_IDX_MAP.keys())  # For ML Model processing
+    # For ML Model processing
+    userTagCounts = np.array([0] * len(TAG_IDX_MAP.keys()))
 
     if (currentProductId is not None):
-        excludedProductIds.append(currentProductId)
-        currentProduct = products_coll.find_one({"_id": userId})
-        # Tags of current product are weighted extra
-        adjustTagWeights(currentProduct, userTagCounts, 4)
+        np.append(excludedProductIds, currentProductId)
+        currentProduct = products_coll.find_one(ObjectId(userId))
+        if (currentProduct is not None):
+            # Tags of current product are weighted extra
+            adjustTagWeights(currentProduct, userTagCounts, 4)
 
     if (cartProductIds is not None):
-        excludedProductIds.insert(cartProductIds)
+        np.append(excludedProductIds, cartProductIds)
 
     if (userId is not None):
         userOrders = orders_coll.find({"createdBy": userId})
         userProductIds = []
         for order in userOrders:
-            userProductIds = order.items.keys()
-            excludedProductIds.insert(userProductIds)
+            userProductIds = list(dict(order['items']).keys())
+            np.append(excludedProductIds, userProductIds)
 
         userProducts = products_coll.find({"_id": {"$in": userProductIds}})
         for product in userProducts:
@@ -73,7 +79,7 @@ def getRecommendations():
 
     # Calculating scores
     allProducts = pd.DataFrame(products_coll.find()).set_index('_id').drop(
-        ['type', '_v', 'brand', 'price', 'createdAt', 'images'])
+        ['type', 'brand', 'price', 'createdAt', 'images'], axis='columns')
     allProducts = allProducts.drop(excludedProductIds)
     # Drop all products that are unavailable or bought
     allProducts: pd.DataFrame = allProducts.loc[allProducts['countInStock'].values != 0]
@@ -82,15 +88,21 @@ def getRecommendations():
         lambda x: np.dot(userTagWeights, x)).sort_values(ascending=False)
 
     # TODO: Now we need to adjust these scores based on recency.
-    print(productScores)
+    # print(productScores)
 
     # We pick and return the products according to metadata.
-    pageSize: int = metadata['pageSize'] if metadata['pageSize'] is not None else 5
-    pageNum: int = metadata['pageNum'] if metadata['pageNum'] is not None else 1
-    returnedProductIds = productScores.index.values[(
-        (pageNum - 1) * pageSize): ((pageNum) * pageSize)]
-    returnedProducts = pd.find({"_id": {"$in": returnedProductIds}})
-    return returnedProducts
+    pageSize = 5
+    pageNum = 1
+    if metadata is not None:
+        pageSize: int = metadata.get('pageSize') if metadata.get(
+            'pageSize') is not None else 5
+        pageNum: int = metadata.get('pageNum') if metadata.get(
+            'pageNum') is not None else 1
+
+    returnedProductIds = list(map(lambda x: str(x), productScores.index.values[(
+        (pageNum - 1) * pageSize): ((pageNum) * pageSize)].tolist()))
+    print(returnedProductIds)
+    return returnedProductIds
 
 
 def createAllTagsCol(row):
@@ -101,15 +113,19 @@ def createAllTagsCol(row):
 
 
 def adjustTagWeights(product: Dict, tagList: np.ndarray, weight: int) -> None:
-    if ('color' in product and product['color'] in TAG_IDX_MAP):
-        tagList[TAG_IDX_MAP[product['color']]] += weight
+    if ('color' in product):
+        if (product['color'] in TAG_IDX_MAP):
+            tagList[TAG_IDX_MAP[product['color']]] += weight
 
-    if ('tags' in product and isinstance(product['tags'], list)):
-        for tag in product['tags']:
-            if (tag in TAG_IDX_MAP):
-                tagList[TAG_IDX_MAP[tag]] += weight
+    if ('tags' in product):
+        if (isinstance(product['tags'], list)):
+            for tag in product['tags']:
+                if (tag in TAG_IDX_MAP):
+                    tagList[TAG_IDX_MAP[tag]] += weight
 
 
 def getPredictedTagWeights(counts):
-    predicted_clust = MODEL.predict([counts])[0]
-    return CLUST_DATA['cluster_weights'][predicted_clust]
+    df = pd.DataFrame(np.array(counts).reshape(1, -1))
+    predicted_clust = MODEL.predict(df)[0]
+    print(f'The predicted cluster is: {predicted_clust}')
+    return CLUST_DATA['cluster_weights_'][predicted_clust]

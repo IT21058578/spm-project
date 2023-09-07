@@ -48,7 +48,7 @@ export class ProductsController {
     'attachment; filename="Sera - Products Report.pdf"',
   )
   async downloadReport(@Query('type') type: string): Promise<StreamableFile> {
-    const file = await this.productsService.downloaProductsReport(type);
+    const file = await this.productsService.downloadProductsReport(type);
     return file;
   }
 

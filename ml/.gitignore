@@ -4,3 +4,6 @@ images
 
 # Config
 .env
+
+# Cache
+__pycache__
