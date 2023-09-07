@@ -18,6 +18,8 @@ import { Order } from 'src/orders/order.schema';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { ConfigKey } from 'src/common/constants/config-key';
+import { ReportsService } from 'src/reports/reports.service';
+import { ReportPurpose } from 'src/common/constants/report-purpose';
 
 @Injectable()
 export class ProductsService {
@@ -26,6 +28,7 @@ export class ProductsService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly reportsService: ReportsService,
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
   ) {}
@@ -159,5 +162,12 @@ export class ProductsService {
     });
 
     return productPage;
+  }
+
+  async downloaProductsReport(type?: string) {
+    const products = await this.productModel.find({
+      ...(type ? { type: type } : {}),
+    });
+    return await this.reportsService.generateReport('PRODUCT', products);
   }
 }

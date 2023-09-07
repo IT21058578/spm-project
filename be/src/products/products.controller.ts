@@ -8,6 +8,9 @@ import {
   HttpStatus,
   HttpCode,
   Body,
+  Query,
+  StreamableFile,
+  Header,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
@@ -55,10 +58,22 @@ export class ProductsController {
     await this.productsService.deleteProduct(id);
   }
 
-  @Post('/recommendations')
+  @Post('recommendations')
   async getRecommendations(
     @Body() getRecommendationsDto: GetRecommendationsDto,
-  ): Page<ProductDocument> {
+  ): Promise<Page<ProductDocument>> {
     return await this.productsService.getRecommendations(getRecommendationsDto);
+  }
+
+  @Get('reports')
+  @Roles(UserRole.ADMIN)
+  @Header('Content-Type', 'application/pdf')
+  @Header(
+    'Content-Disposition',
+    'attachment; filename="Sera - Products Report.pdf"',
+  )
+  async downloadReport(@Query('type') type: string): Promise<StreamableFile> {
+    const file = await this.productsService.downloaProductsReport(type);
+    return file;
   }
 }

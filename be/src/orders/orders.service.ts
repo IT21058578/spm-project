@@ -9,6 +9,7 @@ import ErrorMessage from 'src/common/constants/error-message';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { Page, PageBuilder } from 'src/common/util/page-builder';
 import { DeliveryStatus } from 'src/common/constants/delivery-status';
+import { ReportsService } from 'src/reports/reports.service';
 
 @Injectable()
 export class OrdersService {
@@ -17,6 +18,7 @@ export class OrdersService {
   constructor(
     private readonly productService: ProductsService,
     private readonly userService: UsersService,
+    private readonly reportsService: ReportsService,
     @InjectModel(Order.name) private orderModel: Model<Order>,
   ) {}
 
@@ -69,7 +71,7 @@ export class OrdersService {
     return updatedOrder;
   }
 
-  async deleteProduct(id: string) {
+  async deleteOrder(id: string) {
     const deletedOrder = await this.orderModel.findByIdAndDelete(id);
 
     if (deletedOrder === null) {
@@ -108,5 +110,12 @@ export class OrdersService {
     });
 
     return orderPage;
+  }
+
+  async downloaOrdersReport(userId?: string) {
+    const orders = await this.orderModel.find({
+      ...(userId ? { createdBy: userId } : {}),
+    });
+    return await this.reportsService.generateReport('ORDER', orders);
   }
 }

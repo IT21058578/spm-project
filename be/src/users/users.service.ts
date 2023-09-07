@@ -6,12 +6,14 @@ import { Page, PageBuilder } from 'src/common/util/page-builder';
 import { CreateUserDto } from 'src/common/dtos/create-user.dto';
 import ErrorMessage from 'src/common/constants/error-message';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
+import { ReportsService } from 'src/reports/reports.service';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(
+    private readonly reportsService: ReportsService,
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
@@ -80,6 +82,7 @@ export class UsersService {
       this.userModel.count({}),
       this.userModel
         .find({})
+        .select({ password: 0 })
         .limit(pageSize)
         .skip(skippedDocuments)
         .sort(
@@ -100,5 +103,10 @@ export class UsersService {
     );
 
     return userPage;
+  }
+
+  async downloaUsersReport() {
+    const users = await this.userModel.find({});
+    return await this.reportsService.generateReport('USER', users);
   }
 }

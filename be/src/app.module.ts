@@ -1,5 +1,3 @@
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -31,6 +29,9 @@ import { DataGenService } from './data-gen/data-gen.service';
 import { FileModule } from './file/file.module';
 
 import { ConfigKey } from './common/constants/config-key';
+import { ReportsModule } from './reports/reports.module';
+import { HttpModule } from '@nestjs/axios';
+import { PDFModule } from '@t00nday/nestjs-pdf';
 
 @Module({
   imports: [
@@ -43,8 +44,17 @@ import { ConfigKey } from './common/constants/config-key';
     JwtTokenModule,
     EmailModule,
     DataGenModule,
+    ReportsModule,
+    HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    PDFModule.register({
+      isGlobal: true,
+      view: {
+        root: __dirname + './../assets/templates',
+        engine: 'handlebars',
+      },
     }),
     FileModule.registerAsync({
       imports: [ConfigModule],
@@ -54,9 +64,10 @@ import { ConfigKey } from './common/constants/config-key';
         storageBucket: configService.get(ConfigKey.FIREBASE_BUCKET_NAME),
         projectId: configService.get(ConfigKey.FIREBASE_PROJECT_ID),
         appId: configService.get(ConfigKey.FIREBASE_APP_ID),
-        apiKey: await readFile(
-          join(process.cwd(), './assets/certs/firebase-private-key.pem'),
-          { encoding: 'utf-8' },
+        apiKey: configService.get(ConfigKey.FIREBASE_API_KEY),
+        measurementId: configService.get(ConfigKey.FIREBASE_MEASUREMENT_ID),
+        messagingSenderId: configService.get(
+          ConfigKey.FIREBASE_MESSAGING_SENDER_ID,
         ),
       }),
     }),

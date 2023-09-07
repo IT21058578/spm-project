@@ -5,12 +5,12 @@ import { Product, ProductSchema } from './products.schema';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
 import { Order, OrderSchema } from 'src/orders/order.schema';
-import { ConfigService } from '@nestjs/config';
+import { ReportsModule } from 'src/reports/reports.module';
 
 @Module({
   imports: [
     HttpModule,
-    ConfigService,
+    ReportsModule,
     MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
   ],

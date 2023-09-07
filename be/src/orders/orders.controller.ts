@@ -3,12 +3,14 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   Param,
   Post,
   Put,
   Query,
+  StreamableFile,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from 'src/common/dtos/create-order.dto';
@@ -55,5 +57,22 @@ export class OrdersController {
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteOrders(@Param('id') id: string) {}
+  async deleteOrders(@Param('id') id: string) {
+    await this.ordersService.deleteOrder(id);
+    return;
+  }
+
+  @Get('reports')
+  @Roles(UserRole.ADMIN)
+  @Header('Content-Type', 'application/pdf')
+  @Header(
+    'Content-Disposition',
+    'attachment; filename="Sera - Orders Report.pdf"',
+  )
+  async downloadOrdersReport(
+    @Query('user-id') userId: string,
+  ): Promise<StreamableFile> {
+    const file = await this.ordersService.downloaOrdersReport(userId);
+    return file;
+  }
 }
