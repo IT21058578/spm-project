@@ -13,9 +13,9 @@ import { CreateReviewDto } from 'src/common/dtos/create-review-dto';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { ReviewService } from './review.service';
 import { UpdateReviewDto } from 'src/common/dtos/update-review-dto';
+import { User } from 'src/common/decorators/user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/constants/user-roles';
-import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('reviews')
 export class ReviewsController {

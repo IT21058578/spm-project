@@ -13,9 +13,9 @@ import { LoginDto } from 'src/common/dtos/login.dto';
 import { AuthService } from './auth.service';
 import { ResetPasswordRequestDto } from 'src/common/dtos/reset-password-request.dto';
 import { ChangePasswordRequestDto } from 'src/common/dtos/change-password-request.dto';
+import { User } from 'src/common/decorators/user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/constants/user-roles';
-import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {

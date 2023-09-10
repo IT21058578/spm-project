@@ -16,9 +16,9 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from 'src/common/dtos/create-order.dto';
 import { DeliveryStatus } from 'src/common/constants/delivery-status';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
+import { User } from 'src/common/decorators/user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/constants/user-roles';
-import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('orders')
 export class OrdersController {
