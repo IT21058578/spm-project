@@ -1,0 +1,19 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Sera - Registration</title>
+  </head>
+  <body>
+    <h1>Hi {{name}},</h1>
+    <p>
+        You are almost done with registration. All that remains is to verify your email. 
+        <button onclick="doVerifyEmail()">Verify Email</button>
+    </p>
+    <script>
+        const doVerifyEmail = () => {
+            window.location.href = {{url}}
+        }
+    </script>
+  </body>
+</html
