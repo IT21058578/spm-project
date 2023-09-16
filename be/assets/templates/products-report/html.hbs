@@ -1,0 +1,33 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Sera - Products Report</title>
+  </head>
+  <body>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th rowspan='1'>Product ID</th>
+            <th rowspan='1'>Name</th>
+            <th rowspan='1'>Type</th>
+            <th rowspan='1'>In Stock</th>
+            <th rowspan='1'>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each products}}
+            <tr>
+              <td>{{this._id}}</td>
+              <td>{{this.name}}</td>
+              <td>{{this.type}}</td>
+              <td>{{this.countInStock}}</td>
+              <td>{{this.price}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
