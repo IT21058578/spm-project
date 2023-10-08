@@ -81,7 +81,6 @@ export class ProductsService {
         description: `Product with id '${id}' was not found`,
       });
     }
-
     return deletedProduct;
   }
 
