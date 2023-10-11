@@ -10,7 +10,7 @@
 //     const navigate = useNavigate()
 
 //     useEffect(() => {
-        
+
 //         result.isError && toast.error((result.error as any).data?.message);
 
 //         if(result.isSuccess) {
@@ -23,9 +23,9 @@
 //             }
 //             toast.success(result.data?.message);
 //         }
-        
+
 //     }, [result]);
-    
+
 //     let content : React.ReactNode = null;
 
 //     if (result.isError && result.error?.data) {
@@ -36,47 +36,59 @@
 //                 </div>
 //             ))}
 //         </div>
-        
+
 //     }
 
 //     return <><ToastContainer />{content}</>;
 // }
 
-import React, { useEffect } from "react";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { setItem } from "../Utils/Generals";
 import { useNavigate } from "react-router-dom";
 import RoutePaths from "../config";
+import { useAppDispatch } from "../hooks/redux-hooks";
+import { setUser } from "../store/userSlice";
 
 export const HandleResult = ({ result }: { result: any }) => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
-    useEffect(() => {
-        if (result.isError) {
-            // Handle error response
-            toast.error(result.error.message || "An error occurred.");
-        } else if (result.isSuccess) {
-            // Handle success response
-            const responseData = result.data;
+  useEffect(() => {
+    if (result.isError) {
+      // Handle error response
+      toast.error(result.error.message || "An error occurred.");
+    } else if (result.isSuccess) {
+      // Handle success response
+      const responseData = result.data;
 
-            if (responseData.tokens && responseData.user) {
-                // Assuming responseData.tokens.accessToken contains the access token
-                setItem(RoutePaths.token, responseData.tokens.accessToken);
+      if (responseData.tokens && responseData.user) {
+        // Assuming responseData.tokens.accessToken contains the access token
+        setItem(RoutePaths.token, responseData.tokens.accessToken);
 
-                // Assuming responseData.user contains the user data
-                setItem('user', responseData.user);
+        // Assuming responseData.user contains the user data
+          setItem("user", responseData.user);
+          dispatch(setUser(responseData.user));
 
-                // Redirect to the appropriate route based on user data
-                navigate(responseData.user.roles.includes('ADMIN') ? RoutePaths.admin : RoutePaths.userAccount);
-            } else {
-                // Handle invalid response data
-                toast.error("Invalid response data.");
-            }
+        // Redirect to the appropriate route based on user data
+        navigate(
+          responseData.user.roles.includes("ADMIN")
+            ? RoutePaths.admin
+            : RoutePaths.userAccount
+        );
+      } else {
+        // Handle invalid response data
+        toast.error("Invalid response data.");
+      }
 
-            toast.success(responseData.message || "Login successful.");
-        }
-    }, [result]);
+      toast.success(responseData.message || "Login successful.");
+    }
+  }, [result]);
 
-    return <><ToastContainer /></>;
-}
+  return (
+    <>
+      <ToastContainer />
+    </>
+  );
+};

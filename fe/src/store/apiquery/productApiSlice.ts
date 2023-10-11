@@ -1,102 +1,99 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
-import { ProductType } from '../../components/ProductCart';
-import { BASE_URL } from '../../Utils/Generals';
-import { getItem } from '../../Utils/Generals';
-import RoutePaths from '../../config';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { BASE_URL } from "../../Utils/Generals";
+import { getItem } from "../../Utils/Generals";
+import RoutePaths from "../../config";
 
 const token = getItem(RoutePaths.token);
 
-
 export const productApiSlice = createApi({
-    
-    reducerPath : 'api/products',
-    baseQuery : fetchBaseQuery({baseUrl : BASE_URL ,
-        prepareHeaders(headers) {
-            if (token) {
-              headers.set('Authorization', `Bearer ${token}`);
-            }
-            return headers;
-          },}),
-    tagTypes : ['Products'],
+  reducerPath: "api/products",
+  baseQuery: fetchBaseQuery({
+    baseUrl: BASE_URL,
+    prepareHeaders(headers) {
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  tagTypes: ["Products"],
 
-    endpoints : (builder) => ({
+  endpoints: (builder) => ({
+    getAllProducts: builder.query({
+      query: () => "/products/search",
+      providesTags: ["Products"],
+    }),
 
-        getAllProducts : builder.query(({
-            query : () => '/products/search',
-            providesTags : ['Products']
-        })),
+    getProduct: builder.query({
+      query: (id: string) => `/products/${id}`,
+      providesTags: ["Products"],
+    }),
 
-        getProduct : builder.query({
-            query : (id : string) => `/products/${id}`,
-            providesTags : ['Products']
-        }),
+    searchProduct: builder.query({
+      query: (query: string) => `/product/search/${query}`,
+      providesTags: ["Products"],
+    }),
 
-        searchProduct : builder.query({
-            query : (query : string) => `/product/search/${query}`,
-            providesTags : ['Products']
-        }),
+    getRandomProduct: builder.query({
+      query: () => `/product/types/random`,
+      providesTags: ["Products"],
+    }),
 
-        getRandomProduct : builder.query({
-            query : () => `/product/types/random`,
-            providesTags : ['Products']
-        }),
+    getBestProducts: builder.query({
+      query: () => `/product/types/best-sellers`,
+      providesTags: ["Products"],
+    }),
 
-        getBestProducts : builder.query({
-            query : () => `/product/types/best-sellers`,
-            providesTags : ['Products']
-        }),
+    createProduct: builder.mutation({
+      query: ({ product }) => ({
+        url: "/products",
+        method: "POST",
+        body: product,
+      }),
+      invalidatesTags: ["Products"],
+    }),
 
-        createProduct: builder.mutation({
-            query : ({product}) => ({
-                url : '/products',
-                method : 'POST',
-                body : product
-            }),
-           invalidatesTags : ['Products']
-        }),
+    updateProduct: builder.mutation({
+      query: ({ productId, form }) => ({
+        url: `/products/${productId}`,
+        method: "PUT",
+        body: form,
+      }),
+      invalidatesTags: ["Products"],
+    }),
 
-        updateProduct: builder.mutation({
-            query : ({productId,form}) => ({
-                url : `/products/${productId}`,
-                method : 'PUT',
-                body : form,
-            }),
-            invalidatesTags : ['Products']
-        }),
+    deleteProduct: builder.mutation({
+      query: ({ id }) => ({
+        url: `/products/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Products"],
+    }),
 
-        deleteProduct: builder.mutation({
-            query : ({id}) => ({
-                url : `/products/${id}`,
-                method : 'DELETE',
-            }),
-            invalidatesTags : ['Products']
-        }),
+    downloadProductReports: builder.query({
+      query: () => "/products/reports",
+      providesTags: ["Products"],
+    }),
 
-        downloadProductReports: builder.query(({
-            query : () => '/products/reports',
-            providesTags : ['Products']
-        })),
-
-        uploadImages:builder.mutation({
-            query: ({formData}) => ({
-              url: '/products/images',
-              method: 'POST',
-              body: formData
-            }),
-          }), 
-    })
-})
-
+    uploadImages: builder.mutation({
+      query: ({ formData }) => ({
+        url: "/products/images",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+  }),
+});
 
 export const {
-    useGetAllProductsQuery,
-    useGetProductQuery,
-    useSearchProductQuery,
-    useGetRandomProductQuery,
-    useGetBestProductsQuery,
-    useUpdateProductMutation,
-    useCreateProductMutation,
-    useDeleteProductMutation,
-    useDownloadProductReportsQuery,
-    useUploadImagesMutation
- } = productApiSlice;
+  useGetAllProductsQuery,
+  useGetProductQuery,
+  useSearchProductQuery,
+  useGetRandomProductQuery,
+  useGetBestProductsQuery,
+  useUpdateProductMutation,
+  useCreateProductMutation,
+  useDeleteProductMutation,
+  useDownloadProductReportsQuery,
+  useUploadImagesMutation,
+} = productApiSlice;

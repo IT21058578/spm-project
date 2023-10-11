@@ -55,7 +55,7 @@ export class UsersService {
       });
     }
 
-    return existingUser;
+    return existingUser.toJSON();
   }
 
   async deleteUser(id: string) {

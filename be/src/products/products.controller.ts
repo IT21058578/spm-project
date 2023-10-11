@@ -53,7 +53,7 @@ export class ProductsController {
   }
 
   @Post('images')
-  @Roles(UserRole.USER)
+  @Roles(...Object.values(UserRole))
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @Query('type') type: string,

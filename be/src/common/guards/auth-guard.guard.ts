@@ -24,7 +24,9 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.getToken(request);
     if (!token) {
-      this.logger.debug(`Could not authenticate user`);
+      this.logger.debug(
+        `Could not authenticate user because they had no token`,
+      );
       return true;
     }
     try {
@@ -35,7 +37,9 @@ export class AuthGuard implements CanActivate {
       return true;
     } catch (error) {
       console.log(error);
-      this.logger.debug(`Could not authenticate user`);
+      this.logger.debug(
+        `Could not authenticate user even though they had a token`,
+      );
     }
     this.logger.warn(
       `User attempted to access resources with an invalid token`,
