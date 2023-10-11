@@ -63,7 +63,6 @@ export class JwtTokenService {
     this.logger.log(`Verifying access token '${token}'...`);
     const { payload } = await jwtVerify(token, this.accessPublicKey, {
       issuer: this.issuer,
-      requiredClaims: ['sub'],
       algorithms: [this.keyAlgorithm],
     });
     return payload.sub!;

@@ -32,12 +32,15 @@ export class AuthGuard implements CanActivate {
       const { password, ...user } = await this.usersService.getUser(id);
       this.logger.debug(`Authenticated user with id '${id}'`);
       request['user'] = user;
-    } catch {
+      return true;
+    } catch (error) {
+      console.log(error);
       this.logger.debug(`Could not authenticate user`);
     }
-    this.logger.warn(`User attempted to access resources with an invalid token`);
-    // throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
-    return true;
+    this.logger.warn(
+      `User attempted to access resources with an invalid token`,
+    );
+    throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
   }
 
   private getToken(request: Request): string | undefined {

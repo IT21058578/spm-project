@@ -33,10 +33,13 @@ export class OrdersService {
 
     const order = new this.orderModel();
     order.userId = existingUser.id;
-    order.items = products.reduce((obj: any = {}, product): any => ({
-      ...obj,
-      [product.id]: { qty: items[product.id], price: product.price },
-    })) as any;
+    order.items = products.reduce(
+      (obj: any, product): any => ({
+        ...obj,
+        [product.id]: { qty: items[product.id], price: product.price },
+      }),
+      {},
+    );
     order.totalPrice = products
       .map((product) => product.price)
       .reduce((total, crnt) => total + crnt);
