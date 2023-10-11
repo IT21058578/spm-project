@@ -5,10 +5,9 @@ import {
   StreamableFile,
   Param,
   Body,
-  Post,
   Delete,
   HttpCode,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UsersService } from './users.service';
@@ -24,16 +23,15 @@ export class UsersController {
     return await this.usersService.getUserPage(pageRequest);
   }
 
-
   @Delete(':id')
-  // @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteReview(@Param('id') id: string) {
     await this.usersService.deleteUser(id);
   }
 
   @Get('reports')
-  // @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Header('Content-Type', 'application/pdf')
   @Header(
     'Content-Disposition',

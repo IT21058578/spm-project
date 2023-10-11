@@ -27,7 +27,7 @@ export class ReviewsController {
   }
 
   @Put(':id')
-  // @Roles(UserRole.USER)
+  @Roles(UserRole.USER)
   async editReview(
     @Param('id') id: string,
     @Body() updateReviewDto: UpdateReviewDto,
@@ -36,7 +36,7 @@ export class ReviewsController {
   }
 
   @Delete(':id')
-  // @Roles(UserRole.USER)
+  @Roles(UserRole.USER)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteReview(@Param('id') id: string) {
     await this.reviewService.deleteReview(id);
@@ -48,7 +48,7 @@ export class ReviewsController {
   }
 
   @Post()
-  // @Roles(UserRole.USER)
+  @Roles(UserRole.USER)
   @HttpCode(HttpStatus.CREATED)
   async createReview(
     @User('_id') userId: string,

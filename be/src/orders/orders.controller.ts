@@ -30,7 +30,7 @@ export class OrdersController {
   }
 
   @Get('reports')
-  // @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Header('Content-Type', 'application/pdf')
   @Header(
     'Content-Disposition',
@@ -44,13 +44,13 @@ export class OrdersController {
   }
 
   @Get(':id')
-  // @Roles(UserRole.USER)
+  @Roles(UserRole.USER)
   async getOrder(@Param('id') id: string) {
     return await this.ordersService.getOrder(id);
   }
 
   @Delete(':id')
-  // @Roles(UserRole.USER)
+  @Roles(UserRole.USER)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteOrders(@Param('id') id: string) {
     await this.ordersService.deleteOrder(id);
@@ -58,7 +58,7 @@ export class OrdersController {
   }
 
   @Put(':id')
-  // @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)
   async editOrderDeliveryStatus(
     @Param('id') id: string,
     @Query('delivery-status') deliveryStatus: DeliveryStatus,
@@ -67,7 +67,7 @@ export class OrdersController {
   }
 
   @Post()
-  // @Roles(UserRole.USER)
+  @Roles(UserRole.USER)
   @HttpCode(HttpStatus.CREATED)
   async createOrders(
     @User('_id') userId: string,
