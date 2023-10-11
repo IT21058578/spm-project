@@ -4,19 +4,9 @@ import RoutePaths from '../config';
 import { ProductType } from '../components/ProductCart';
 import Swal from 'sweetalert2';
 import { SyntheticEvent } from 'react';
+import { UserType } from '../types';
 
 
-export type User = {
-
-    id?: number,
-    firstname?: string,
-    lastname?: string,
-    email?: string,
-    phone?: string,
-    address?: string,
-    password?: string,
-    password_confirmation?: string,
-}
 
 export const toggleLinkClass = (path : string, activeClass : string = active, inactiveClass : string = inactive) => {
 
@@ -56,7 +46,7 @@ export const getTotal = () => {
 
 }
 
-export const link = (url : string) : string => BASE_STORAGE_URL + url;
+// export const link = (url : string) : string => BASE_STORAGE_URL + url;
 
 export const checkLogin = () => {
     
@@ -64,31 +54,27 @@ export const checkLogin = () => {
     return !!isLogged;
 }
 
-type CheckOut = {product_id : number, quantity? : number};
+type CheckOut = {product_id : string, quantity? : number};
 
 export const buildCheckoutData = () => {
     
     const products = useAppSelector((state) => state.productCart);
-    const user : User = useAppSelector((state) => state.user)
+    const user : UserType = useAppSelector((state) => state.user)
 
     let checkoutData : CheckOut[] = [];
 
     products.forEach((product : ProductType) => {
         checkoutData.push({
-            product_id: product.id,
+            product_id: product._id,
             quantity: product.quantity || 1,
         })
     })
 
-    return {user_id: user.id, commands : checkoutData};
+    return {user_id: user._id, commands : checkoutData};
 }
 
 
-// export const BASE_URL = 'http://friedshop-back-laravel.test/api/'; // BASE URL FOR API FETCHING
-export const BASE_URL = 'https://friedshop.kabirou-alassane.com/api'; // BASE URL FOR API FETCHING
-
-export const BASE_STORAGE_URL = 'https://friedshop.kabirou-alassane.com/storage/'; // BASE URL FOR FETCHING MEDIA (image, video, etc.)
-// export const BASE_STORAGE_URL = 'http://friedshop-back-laravel.test/storage/'; // BASE URL FOR FETCHING MEDIA (image, video, etc.)
+export const BASE_URL = 'http://localhost:3000'; // BASE URL FOR API FETCHING
 
 const active = "d-block p-3 fd-nav-active"; // WHERE MENU IS ACTIVE CLASS 
 

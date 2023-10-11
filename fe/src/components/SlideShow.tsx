@@ -2,7 +2,6 @@ import React, { ReactNode } from "react";
 import { Carousel } from "react-responsive-carousel";
 import { useGetAllSlidesQuery } from "../store/apiquery/slideApiSlice";
 import { Slide } from "../views/VirtualData";
-import { link } from "../Utils/Generals";
 import Spinner from "./Spinner";
 import { Link } from "react-router-dom";
 import RoutePaths from "../config";
@@ -20,11 +19,11 @@ type SlideOptions = {
 };
 
 const SlideShow = (props: { options?: {} }) => {
-  const {
-    isLoading,
-    data: slides,
-    isError,
-  } = useGetAllSlidesQuery("api/slides");
+  // const {
+  //   isLoading,
+  //   data: slides,
+  //   isError,
+  // } = useGetAllSlidesQuery("api/slides");
 
   return (
     // <Carousel autoPlay={true} showArrows={false} showStatus={false} showThumbs={false} swipeable={true} infiniteLoop={true} interval={3000}>

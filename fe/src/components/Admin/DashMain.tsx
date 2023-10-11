@@ -1,9 +1,35 @@
 import React from "react";
-import { useGetStartisticsQuery } from "../../store/apiquery/usersApiSlice";
+// import { useGetStartisticsQuery } from "../../store/apiquery/usersApiSlice";
 import Spinner from "../Spinner";
+import { useGetAllProductsQuery } from "../../store/apiquery/productApiSlice";
+import { useGetAllUsersQuery } from "../../store/apiquery/usersApiSlice";
+import { useGetAllOrderQuery } from "../../store/apiquery/OrderApiSlice";
+import { useGetAllReviewQuery } from "../../store/apiquery/ReviewApiSlice";
+
 
 const DashMain = () => {
-  const { data: starts, isLoading } = useGetStartisticsQuery("api/users");
+  // const { data: starts, isLoading } = useGetStartisticsQuery("api/users");
+  const {data: products } = useGetAllProductsQuery("api/products");
+  const {data: reviews  } = useGetAllReviewQuery("api/reviews");
+  const {data: users } = useGetAllUsersQuery("api/users");
+  const {data: orders } = useGetAllOrderQuery("api/orders");
+
+
+  const handleProductsDownload = () => {
+      const reportURL = 'http://localhost:3000/products/reports'; 
+      window.location.href = reportURL;
+  };
+
+  const handleOrdersDownload = () => {
+    const reportURL = 'http://localhost:3000/orders/reports'; 
+    window.location.href = reportURL;
+  };
+
+  const handleCustomersDownload = () => {
+    const reportURL = 'http://localhost:3000/users/reports'; 
+    window.location.href = reportURL;
+  };
+
 
   const format = (nb: number | string, lenght: number = 2) => {
     const value = nb.toString();
@@ -13,44 +39,41 @@ const DashMain = () => {
   return (
     <div className="dash-user pt-2">
       <h4 className="text-dark fw-bold">Dashboard</h4>
-      {!isLoading ? (
         <div className="resume d-grid grid-4 gap-3 fw-bold mt-3">
-          <div className="r-card d-flex justify-content-center gap-3 border border-1 bg-secondary p-3">
-            <h1>{format(starts.data.products)}</h1>
-            <h4 className="align-self-center">Total Products</h4>
-          </div>
-          <div className="r-card d-flex justify-content-center gap-3 border border-1 bg-secondary p-3">
-            <h1>{format(starts.data.customers)}</h1>
-            <h4 className="align-self-center">Total Customers</h4>
-          </div>
-          <div className="r-card d-flex justify-content-center gap-3 border border-1 bg-secondary p-3">
-            <h1>{format(starts.data.products)}</h1>
-            <h4 className="align-self-center">Popular Products</h4>
-          </div>
-          <div className="r-card d-flex justify-content-center gap-3 border border-1 bg-secondary p-3">
-            <h1>{format(starts.data.categories)}</h1>
-            <h4 className="align-self-center">Categories</h4>
-          </div>
-          <div className="r-card d-flex justify-content-center gap-3 border border-1 bg-secondary p-3">
-            <h1>{format(starts.data.slides)}</h1>
-            <h4 className="align-self-center">SLIDES</h4>
-          </div>
-          <div className="r-card d-flex justify-content-center gap-3 border border-1 bg-secondary p-3">
-            <h1>03</h1>
-            <h4 className="align-self-center">Total Posts</h4>
-          </div>
-          <div className="r-card d-flex justify-content-center gap-3 border border-1 bg-secondary p-3">
-            <h1>{format(starts.data.admins)}</h1>
-            <h4 className="align-self-center">Admins</h4>
-          </div>
-          <div className="r-card d-flex justify-content-center gap-3 border border-1 bg-secondary p-3">
-            <h1>{format(starts.data.categories)}</h1>
-            <h4 className="align-self-center">Categories</h4>
-          </div>
+        <div className="r-card d-flex flex-column align-items-center gap-3 border border-1 bg-secondary p-3">
+          <h1>{products?.metadata.totalDocuments}</h1>
+          <h4 className="align-self-center">Total Products</h4>
         </div>
-      ) : (
-        <Spinner />
-      )}
+        <div className="r-card d-flex flex-column align-items-center gap-3 border border-1 bg-secondary p-3">
+          <h1>{reviews?.metadata.totalDocuments}</h1>
+          <h4 className="align-self-center">Total Reviews</h4>
+        </div>
+        <div className="r-card d-flex flex-column align-items-center gap-3 border border-1 bg-secondary p-3">
+          <h1>{users?.metadata.totalDocuments}</h1>
+          <h4 className="align-self-center">Total Users</h4>
+        </div>
+        <div className="r-card d-flex flex-column align-items-center gap-3 border border-1 bg-secondary p-3">
+          <h1>{orders?.metadata.totalDocuments}</h1>
+          <h4 className="align-self-center">Total Orders</h4>
+        </div>
+      </div>
+      <h4></h4>
+      <h4></h4>
+      <h4 className="text-dark fw-bold">Reports</h4>
+        <div className="resume d-grid grid-4 gap-3 fw-bold mt-3">
+          <button className="r-card btn btn-success d-flex justify-content-center gap-3 border border-1 p-3" onClick={handleProductsDownload}>
+            <h4 className="align-self-center">Products</h4>
+          </button>
+          <button className="r-card btn btn-success d-flex justify-content-center gap-3 border border-1 p-3" >
+            <h4 className="align-self-center">Reviews</h4>
+          </button>
+          <button className="r-card btn btn-success d-flex justify-content-center gap-3 border border-1 p-3" onClick={handleCustomersDownload}>
+            <h4 className="align-self-center">Users</h4>
+          </button>
+          <button className="r-card btn btn-success d-flex justify-content-center gap-3 border border-1 p-3" onClick={handleOrdersDownload}>
+            <h4 className="align-self-center">Ordes</h4>
+          </button>
+        </div>
 
       <div className="user-dashboard p-3 border border-3 text-black mt-5">
         <p className="opacity-75">

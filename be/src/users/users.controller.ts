@@ -6,6 +6,9 @@ import {
   Param,
   Body,
   Post,
+  Delete,
+  HttpCode,
+  HttpStatus
 } from '@nestjs/common';
 import { PageRequest } from 'src/common/dtos/page-request.dto';
 import { UsersService } from './users.service';
@@ -16,13 +19,21 @@ import { UserRole } from 'src/common/constants/user-roles';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post('search')
+  @Get('search')
   async getUsersPage(@Body() pageRequest: PageRequest) {
     return await this.usersService.getUserPage(pageRequest);
   }
 
+
+  @Delete(':id')
+  // @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteReview(@Param('id') id: string) {
+    await this.usersService.deleteUser(id);
+  }
+
   @Get('reports')
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.ADMIN)
   @Header('Content-Type', 'application/pdf')
   @Header(
     'Content-Disposition',

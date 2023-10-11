@@ -7,7 +7,7 @@ const AddToCart = ({ product, classSup = '', divClass = '' }: { product: Product
 
   const dispatch = useAppDispatch();
   const exist: ProductType[] = useAppSelector((state) => state.productCart);
-  const isExistInCart = exist.find((stateProduct) => stateProduct.id == product.id);
+  const isExistInCart = exist.find((stateProduct) => stateProduct._id == product._id);
 
   return <>
     {

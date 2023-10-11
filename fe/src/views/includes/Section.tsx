@@ -44,29 +44,41 @@ const Category = ({
 };
 
 const AllCategory = () => {
-  const {
-    isLoading,
-    data: categoryList,
-    isError,
-  } = useGetAllCategoriesQuery("api/categories");
+  // const {
+  //   isLoading,
+  //   data: categoryList,
+  //   isError,
+  // } = useGetAllCategoriesQuery("api/categories");
+
+  const isError = false;
 
   return (
     <div className="all-category col-3 d-none d-xl-block shadow border-1 border-light p-0">
       <h6 className="fd-bg-primary p-3 fw-bold rounded-top-3">
         ALL CATEGORIES
       </h6>
-      {!isLoading && !isError ? (
-        <div className="category-list d-flex flex-column gap-4 py-2 px-3">
-          {
-            // categoryList['data'].map((category: CategoryType) => <Category category={category} arrow='right' key={category.id} />)
-            apiCategory.map((category: CategoryType) => (
-              <Category category={category} arrow="right" key={category.id} />
-            ))
-          }
-        </div>
+      {/* { isError ? (
+          <Spinner />
       ) : (
-        <Spinner />
-      )}
+        <div className="category-list d-flex flex-column gap-4 py-2 px-3">
+        {
+          // categoryList['data'].map((category: CategoryType) => <Category category={category} arrow='right' key={category.id} />)
+          apiCategory.map((category: CategoryType) => (
+            <Category category={category} arrow="right" key={category.id} />
+          ))
+        }
+      </div>
+      )} */}
+
+      <div className="category-list d-flex flex-column gap-4 py-2 px-3">
+        {apiCategory ? ( // Check if apiCategory is defined
+          apiCategory.map((category: CategoryType) => (
+            <Category category={category} arrow="right" key={category.id} />
+          ))
+        ) : (
+          <Spinner /> // Display a spinner if apiCategory is undefined
+        )}
+      </div>
     </div>
   );
 };
@@ -238,11 +250,11 @@ const PopularProducts = ({
   content =
     isLoading || isError ? (
       <Spinner />
-    ) : isSuccess ? (
-      // ? productsList['data'].map((product: ProductType) => <ProductCart {...product} type={type} key={product.id} />)
-      sortProducts.map((product: ProductType) => (
-        <ProductCart {...product} type={type} key={product.id} />
-      ))
+    ) : isSuccess && productsList && productsList.content ? (
+      productsList.content.map((product: ProductType) => <ProductCart {...product} type={type} key={product._id} />)
+      // sortProducts.map((product: ProductType) => (
+      //   <ProductCart {...product} type={type} key={product.id} />
+      // ))
     ) : null;
 
   return (
@@ -256,18 +268,55 @@ const PopularProducts = ({
   );
 };
 
+// const PopularProducts = ({
+//   grid = 3,
+//   type = "grid",
+// }: {
+//   grid?: number | boolean;
+//   type?: string;
+// }) => {
+//   const {
+//     isLoading,
+//     data: productsList,
+//     isSuccess,
+//     isError,
+//   } = useGetAllProductsQuery("api/products");
+
+//   let content: React.ReactNode;
+
+//   if (isLoading || isError) {
+//     content = <Spinner />;
+//   } else if (isSuccess && productsList?.data) { // Add a null check here
+//     content = productsList.data.map((product: ProductType) => (
+//       <ProductCart {...product} type={type} key={product._id} />
+//     ));
+//   } else {
+//     content = null;
+//   }
+
+//   return (
+//     <div
+//       className={
+//         type === "list" ? "test" : `d-grid gap-3 grid-0 grid-lg-${grid}`
+//       }
+//     >
+//       {content}
+//     </div>
+//   );
+// };
+
 const SortProducts = () => {
-  const { data: products, isLoading, isError } = useGetBestProductsQuery("");
+  const { data: products, isLoading, isError } = useGetAllProductsQuery("api/products");
 
   return (
     <>
-      {!isLoading && !isError ? (
+      {!isLoading && !isError && products && products.content? (
         <div>
           {
-            // products.data.map((product: { products: ProductType }) => <ProductSort {...product.products} key={product.products.id} />)
-            sortProducts.map((product) => (
-              <ProductSort key={product.id} {...product} />
-            ))
+            products.content.map((product: ProductType ) => <ProductSort {...product} key={product._id} />)
+            // sortProducts.map((product) => (
+            //   <ProductSort key={product.id} {...product} />
+            // ))
           }
         </div>
       ) : (

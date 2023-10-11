@@ -2,24 +2,31 @@ import React, { SyntheticEvent } from 'react'
 import Header from './includes/Header'
 import Banner from '../components/Banner'
 import Footer from './includes/Footer'
-import { User, buildCheckoutData, getTotal } from '../Utils/Generals'
+import { buildCheckoutData, getTotal } from '../Utils/Generals'
 import { useAppSelector } from '../hooks/redux-hooks'
-import { useCreateCommandMutation } from '../store/apiquery/CommandApiSlice'
+import { useCreateOrderMutation } from '../store/apiquery/OrderApiSlice'
 import { HandleResult } from '../components/HandleResult'
 import LoadingButton from '../components/LoadingButton'
+import { UserType } from '../types'
+import { getItem } from '../Utils/Generals'
+import RoutePaths from '../config'
 
 const Checkout = () => {
 
-    const user : User = useAppSelector(state => state.user);
+    const user : UserType = useAppSelector(state => state.user);
     const data = buildCheckoutData();
-    const [sendData, result] = useCreateCommandMutation();
+    const [sendData, result] = useCreateOrderMutation();
+
+    const token = getItem(RoutePaths.token);
+
+    const userId = user._id;
+
 
     const submitCheckout = (e : SyntheticEvent) => {
 
         e.preventDefault();
 
-        sendData(data)
-       
+        sendData({userId,token,data}); 
     }
 
 
@@ -35,11 +42,11 @@ const Checkout = () => {
                     <div className='d-flex gap-2 mt-5'>
                         <label className='w-50'>
                             <span>First Name *</span>
-                            <input type="text" name="firstname" defaultValue={user.firstname || ''} readOnly  className="form-control w-100 rounded-0 p-2"/>
+                            <input type="text" name="firstname" defaultValue={user.firstName || ''} readOnly  className="form-control w-100 rounded-0 p-2"/>
                         </label>
                         <label className='w-50'>
                             <span>Last Name *</span>
-                            <input type="email" name="lastname" defaultValue={user.lastname || ''} readOnly  className="form-control w-100 rounded-0 p-2"/>
+                            <input type="email" name="lastname" defaultValue={user.lastName || ''} readOnly  className="form-control w-100 rounded-0 p-2"/>
                         </label>
                     </div>
                     <div className='my-4'>
@@ -48,26 +55,18 @@ const Checkout = () => {
                             <input type="email" name="email" defaultValue={user.email || ''} readOnly  className="form-control w-100 rounded-0 p-2"/>
                         </label>
                     </div>
-                    <div>
-                        <label className='w-100'>
-                            <span>Phone *</span>
-                            <input type="text" name="phone" defaultValue={user.phone || ''} readOnly  className="form-control w-100 rounded-0 p-2"/>
-                        </label>
-                    </div>
                     <div className='my-4'>
                         <label className='w-100'>
                             <span>Country *</span>
                             <select name="country" className="form-control">
-                                <option defaultValue="">Bénin</option>
-                                <option defaultValue="">France</option>
-                                <option defaultValue="">United Kingdom</option>
+                                <option defaultValue="">{user.country}</option>
                             </select>
                         </label>
                     </div>
                     <div>
                         <label className='w-100'>
                             <span>Address *</span>
-                            <input type="text" name="firstname" defaultValue={user.address} readOnly className="form-control w-100 rounded-0 p-2"/>
+                            <input type="text" name="address" defaultValue={user.region} readOnly className="form-control w-100 rounded-0 p-2"/>
                         </label>
                     </div>
                     <div className='my-4'>

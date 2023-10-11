@@ -5,17 +5,19 @@ import { Link } from 'react-router-dom';
 import AddToCart from './AddToCart';
 import { useGetRandomProductQuery } from '../store/apiquery/productApiSlice';
 import Spinner from './Spinner';
-import { link } from '../Utils/Generals';
 import { sortProducts } from '../views/VirtualData';
+import { isError } from 'react-query';
 
 const ProductOfDay = () => {
 
-    const { data: product, isLoading, isError } = useGetRandomProductQuery("");
+    // const { data: product, isLoading, isError } = useGetRandomProductQuery("");
+
+    const isError = false;
 
     return (
         <>
             {
-                !isLoading && !isError ?
+                 !isError ?
                     <div className="row">
                         <div className="col-12 col-lg-3">
                             {/* <Link to={"/product/" + product.data[0].id}>
@@ -50,8 +52,8 @@ const ProductOfDay = () => {
                                 <AddToCart product={product.data[0]} divClass='align-self-center' />
                             </div> */}
                             <div className='d-flex gap-2'>
-                                <NumberCount product={sortProducts[0]} min={1} />
-                                <AddToCart product={sortProducts[0]} divClass='align-self-center' />
+                                {/* <NumberCount product={sortProducts[0]} min={1} />
+                                <AddToCart product={sortProducts[0]} divClass='align-self-center' /> */}
                             </div>
                         </div>
                     </div> :

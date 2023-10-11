@@ -58,7 +58,7 @@ export const productWhishListSlice = createSlice({
 
         deleteProductInWishlist(state, action : PayloadAction<ProductType>) {
 
-            state = state.filter((product) => product.id != action.payload.id);
+            state = state.filter((product) => product._id != action.payload._id);
             setItem(wishlistKeyName, state);
             return state;
         }
@@ -103,14 +103,14 @@ export const productCartSlice = createSlice({
 
         deleteProductInCart(state, action : PayloadAction<ProductType>) {
 
-            state = state.filter((product) => product.id != action.payload.id);
+            state = state.filter((product) => product._id != action.payload._id);
             setItem(cartKeyName, state);
             return state;
         },
 
         setProductQuantity(state, action : PayloadAction<{product : ProductType, quantitySaved : number}>) {
 
-            const product = state.find((product) => product.id == action.payload.product.id);
+            const product = state.find((product) => product._id == action.payload.product._id);
 
             if (product) {
              product.quantity = action.payload.quantitySaved;

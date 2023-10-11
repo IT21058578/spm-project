@@ -35,12 +35,12 @@ const Header: FC = () => {
 
     const isLogged = getItem(RoutePaths.token);
     const user = !isLogged ? null : JSON.parse(getItem('user') || '');
-    const { data } = !user ? { data: null } : useGetUserQuery(user.id);
+    const { data } = !user ? { data: null } : useGetUserQuery(user._id);
 
     useEffect(() => {
 
         if (data) {
-            dispatch(setUser(data.data));
+            dispatch(setUser(data));
         }
     }
         , [data]);

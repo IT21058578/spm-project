@@ -1,21 +1,31 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 import { BASE_URL } from '../../Utils/Generals';
+import { getItem } from '../../Utils/Generals';
+import RoutePaths from '../../config';
+
+const token = getItem(RoutePaths.token);
 
 export const usersApiSlice = createApi({
     
     reducerPath : 'api/users',
-    baseQuery : fetchBaseQuery({baseUrl : BASE_URL}),
+    baseQuery : fetchBaseQuery({baseUrl : BASE_URL ,
+        prepareHeaders(headers) {
+            if (token) {
+              headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+          },}),
     tagTypes : ['Users'],
 
     endpoints : (builder) => ({
 
         getAllUsers : builder.query(({
-            query : () => '/user',
-            providesTags : ['Users']
+            query : () => '/users/search',
+            providesTags : ['Users'],
         })),
 
         getUser : builder.query({
-            query : (user) => `/user/${user}`,
+            query : (id) => `/users/${id}`,
             providesTags : ['Users']
         }),
 
@@ -34,7 +44,7 @@ export const usersApiSlice = createApi({
 
         updateUser: builder.mutation({
             query : (data) => ({
-                url : 'user/edit',
+                url : '/user/edit',
                 method : 'POST',
                 body : {_method : 'patch', ...data},
             }),
@@ -42,10 +52,9 @@ export const usersApiSlice = createApi({
         }),
 
         deleteUser: builder.mutation({
-            query : (id : number) => ({
-                url : '/user/delete',
+            query : ({id}) => ({
+                url : `/users/${id}`,
                 method : 'DELETE',
-                body : {id}
             }),
             invalidatesTags : ['Users']
         })

@@ -1,32 +1,30 @@
 import React, { useState, SyntheticEvent, useEffect, useRef, ChangeEvent } from 'react'
 import { ProductType } from '../ProductCart'
 import { useCreateProductMutation, useDeleteProductMutation, useGetAllProductsQuery, useUpdateProductMutation } from '../../store/apiquery/productApiSlice';
-import { link } from '../../Utils/Generals';
 import Swal from 'sweetalert2';
 import Spinner from '../Spinner';
 import { HandleResult } from '../HandleResult';
-import { useGetAllCategoriesQuery } from '../../store/apiquery/categoryApiSlice';
-import { CategoryType } from '../../views/VirtualData';
-import { sortProducts } from '../../views/VirtualData';
+import { getItem } from '../../Utils/Generals';
+import RoutePaths from '../../config';
+import { useUploadImagesMutation } from '../../store/apiquery/productApiSlice';
 
 let imageIsChanged = false;
 
 const UpdateProduct = ({product}: {product : ProductType}) => {
 
-	const { data : categories } = useGetAllCategoriesQuery('api/categories')
+	// const { data : categories } = useGetAllCategoriesQuery('api/categories')
 
 	const [updateData, setUpdateData] = useState(product);
 	const [updateProduct, udpateResult] = useUpdateProductMutation();
 	const imageTag = useRef<HTMLImageElement>(null);
+	const productId = product?._id;
+	const token = getItem(RoutePaths.token);
 
 	const handleSubmit = (e: SyntheticEvent) => {
 
 		e.preventDefault();
 		const form = new FormData(e.target as HTMLFormElement);
-		form.append('_method', 'patch');
-		form.append('imageEdited', imageIsChanged.toString());
-		form.append('reviews', '5'); // Pour le moment
-		updateProduct(form);
+		updateProduct({productId,form,token});
 		imageIsChanged = false;
 
 	}
@@ -47,9 +45,9 @@ const UpdateProduct = ({product}: {product : ProductType}) => {
 
 	return (
 		<form action="" method="patch" className="checkout-service p-3" onSubmit={handleSubmit}>
-			<input type="hidden" name="id" value={updateData.id}/>
-			{/* <div className="w-25 mx-auto p-3 border border-1 rounded-5 fd-hover-border-primary" style={{ height: '250px' }}><img src={link(product.img)} alt={product.name} className='w-100 h-100' ref={imageTag}/></div> */}
-			<div className="w-25 mx-auto p-3 border border-1 rounded-5 fd-hover-border-primary" style={{ height: '250px' }}><img src={product.img} alt={product.name} className='w-100 h-100' ref={imageTag}/></div>
+			<input type="hidden" name="id" value={updateData._id}/>
+			<div className="w-25 mx-auto p-3 border border-1 rounded-5 fd-hover-border-primary" style={{ height: '250px' }}><img src={product.images[0]} alt={product.name} className='w-100 h-100' ref={imageTag}/></div>
+			{/* <div className="w-25 mx-auto p-3 border border-1 rounded-5 fd-hover-border-primary" style={{ height: '250px' }}><img src={product.img} alt={product.name} className='w-100 h-100' ref={imageTag}/></div> */}
 			<div className='d-flex gap-2'>
 				<label className='w-50'>
 					<span>Name</span>
@@ -57,7 +55,7 @@ const UpdateProduct = ({product}: {product : ProductType}) => {
 				</label>
 				<label className='w-50'>
 					<span>Image</span>
-					<input type="file" name="img" className="form-control w-100 rounded-0 p-2" placeholder='Change Image' onChange={handleUpdateValue}/>
+					<input type="file" name="images" className="form-control w-100 rounded-0 p-2" placeholder='Change Image' onChange={handleUpdateValue}/>
 				</label>
 			</div>
 			<div className='d-grid grid-4 gap-2 mt-3'>
@@ -66,45 +64,23 @@ const UpdateProduct = ({product}: {product : ProductType}) => {
 					<input type="number" name="price" className="form-control w-100 rounded-0 p-2" value={updateData.price} onChange={handleUpdateValue} />
 				</label>
 				<label>
-					<span>Old Price</span>
-					<input type="number" name="old_price" className="form-control w-100 rounded-0 p-2" value={updateData.old_price} onChange={handleUpdateValue} />
+					<span>Color</span>
+					<input type="text" name="color" className="form-control w-100 rounded-0 p-2" value={updateData.color} onChange={handleUpdateValue} />
 				</label>
 				<label>
 					<span>Quantity</span>
-					<input type="number" name="total_quantity" className="form-control w-100 rounded-0 p-2" value={updateData.total_quantity} onChange={handleUpdateValue} />
+					<input type="text" name="CountInStock" className="form-control w-100 rounded-0 p-2" value={updateData.countInStock} onChange={handleUpdateValue} />
 				</label>
 				<label>
-					<span>Reduction</span>
-					<input type="text" name="reduction" className="form-control w-100 rounded-0 p-2" value={updateData.reduction ?? 0} onChange={handleUpdateValue} />
+					<span>Brand</span>
+					<input type="text" name="brand" className="form-control w-100 rounded-0 p-2" value={updateData.brand} onChange={handleUpdateValue} />
 				</label>
 			</div>
-			<div className='mt-4'>
-					<label className='w-100'>
-						<span>Category</span>
-						<select name="categorie_id" className='form-select w-100'>
-							<option value="">Select Category</option>
-                            {
-								categories && categories.data.map((category : CategoryType) => (
-                                    <option key={category.id} value={category.id}
-										selected={product.categorie_id == category.id ? true : false}>
-										{category.name}
-									</option>
-                                ))
-							}
-						</select>
-					</label>
-				</div>
 			<div className='my-4'>
 				<label>
-					<span>Description</span>
+					<span>Tags</span>
 				</label>
-				<textarea name="desc" cols={100} rows={10} className='w-100 p-2 border' placeholder='Description' value={updateData.desc} onChange={handleUpdateValue}></textarea>
-			</div>
-			<div>
-				<label>
-					<input type="checkbox" name="deal_of_day" />
-					<span className='ms-2'>Deal Of Day</span>
-				</label>
+				<textarea name="Tags" cols={100} rows={10} className='w-100 p-2 border' placeholder='tags' value={updateData.tags} onChange={handleUpdateValue}></textarea>
 			</div>
 			<div className='mt-4'>
 				<HandleResult result={udpateResult} />
@@ -123,20 +99,44 @@ const UpdateProduct = ({product}: {product : ProductType}) => {
 
 const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
 
-	const [image, setImage] = useState<Blob | null>(null);
 	const [data, setData] = useState({});
 
-	const { data : categories } = useGetAllCategoriesQuery('api/categories')
+	// const { data : categories } = useGetAllCategoriesQuery('api/categories')
 
 	const [createProduct, result] = useCreateProductMutation();
-
+	const [uploadImages] = useUploadImagesMutation(); // Destructure the mutation function
+	const [image, setImage] = useState<File | null>(null);
+  
+	  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files[0]) {
+		  setImage(e.target.files[0]);
+		}
+	  };
+	
+	  const handleImageUpload = async () => {
+		if (image) {
+		  const formData = new FormData();
+		  formData.append('file', image);
+	
+		  try {
+			const result = await uploadImages(formData); 
+			if ('data' in result && result.data) {
+			  console.log('Image uploaded successfully');
+			} else if ('error' in result && result.error) {
+			  console.error('Image upload failed', result.error);
+			}
+		  } catch (error) {
+			console.error('Image upload failed', error);
+		  }
+		}
+	  };
+	
 
 	const handleSubmit = (e: SyntheticEvent) => {
 
 		e.preventDefault();
 
 		const form = new FormData(e.target as HTMLFormElement);
-		form.append('reviews', '5'); // Pour le moment
 		createProduct(form);
 
 	}
@@ -165,11 +165,8 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
 					</label>
 					<label className='w-50'>
 						<span>Image</span>
-						<input type="file" name="img" className="form-control w-100 rounded-0 p-2" placeholder='Product Image'
-							onChange={(e: ChangeEvent<HTMLInputElement>) => {
-								const file = e.target.files && e.target.files[0];
-								setImage(file)
-							}} accept='image/*' />
+						<input type="file" name="image" className="form-control w-100 rounded-0 p-2" placeholder='Product Image'
+							onChange={handleImageChange} accept='image/*' />
 					</label>
 				</div>
 				<div className='d-grid grid-4 gap-2 mt-3'>
@@ -178,36 +175,23 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
 						<input type="number" step={0.1} name="price" className="form-control w-100 rounded-0 p-2" placeholder='Product Price' onChange={handleValue} />
 					</label>
 					<label>
-						<span>Old Price</span>
-						<input type="number" step={0.1} name="old_price" className="form-control w-100 rounded-0 p-2" placeholder='Old Price' onChange={handleValue} />
+						<span>Color</span>
+						<input type="string" step={0.1} name="color" className="form-control w-100 rounded-0 p-2" placeholder='Color' onChange={handleValue} />
 					</label>
 					<label>
 						<span>Quantity</span>
-						<input type="number" name="total_quantity" className="form-control w-100 rounded-0 p-2" placeholder='Total Quantity' onChange={handleValue} />
+						<input type="number" name="CountInStock" className="form-control w-100 rounded-0 p-2" placeholder='Quantity' onChange={handleValue} />
 					</label>
 					<label>
-						<span>Reduction</span>
-						<input type="text" name="reduction" className="form-control w-100 rounded-0 p-2" value={0} placeholder='Reduction ?' onChange={handleValue} />
-					</label>
-				</div>
-				<div className='mt-4'>
-					<label className='w-100'>
-						<span>Category</span>
-						<select name="categorie_id" className='form-select w-100'>
-							<option value="">Select Category</option>
-                            {
-								categories && categories.data.map((category : CategoryType) => (
-                                    <option key={category.id} value={category.id}>{category.name}</option>
-                                ))
-							}
-						</select>
+						<span>Brand</span>
+						<input type="text" name="brand" className="form-control w-100 rounded-0 p-2" placeholder='Brand' onChange={handleValue} />
 					</label>
 				</div>
 				<div className='my-4'>
 					<label>
-						<span>Description</span>
+						<span>Tags</span>
 					</label>
-					<textarea name="desc" cols={100} rows={10} className='w-100 p-2 border' placeholder='Description' onChange={handleValue}></textarea>
+					<textarea name="tags" cols={100} rows={10} className='w-100 p-2 border' placeholder='Tags' onChange={handleValue}></textarea>
 				</div>
 				<div className="mt-3">
 					<HandleResult result={result} />
@@ -215,7 +199,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
 				<div className='mt-3'>{result.isLoading ?
 					<button className="fd-btn w-25 text-center border-0"><span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
 						Loading...</button> :
-					<button className="fd-btn w-25 text-center border-0">SAVE NOW</button>
+					<button className="fd-btn w-25 text-center border-0" onClick={handleImageUpload}>SAVE NOW</button>
 				}</div>
 			</form>
 		)
@@ -235,7 +219,7 @@ const ListOfProducts = ({ setProduct, setPage }: { setProduct: Function, setPage
 		setPage('add');
 	}
 
-	const deleteItem = (id: number) => {
+	const deleteItem = (id: string) => {
 		Swal.fire({
 			title: 'Are you sure?',
 			text: "Are you sure to delete this product ?",
@@ -256,23 +240,23 @@ const ListOfProducts = ({ setProduct, setPage }: { setProduct: Function, setPage
 	content = isLoading || isError
 		? null
 		: isSuccess
-			// ? productsList['data'].map((product: ProductType) => {
-			? sortProducts.map((product: ProductType) => {
+			? productsList.content.map((product: ProductType) => {
+			// ? sortProducts.map((product: ProductType) => {
 
 				return (
-					<tr className="p-3" key={product.id}>
-						{/* <td scope="row w-25"><img src={link(product.img)} alt={product.name} style={{ width: '50px', height: '50px' }} /></td> */}
-						<td scope="row w-25"><img src={product.img} alt={product.name} style={{ width: '50px', height: '50px' }} /></td>
+					<tr className="p-3" key={product._id}>
+						<td scope="row w-25"><img src={product.images[0]} alt={product.name} style={{ width: '50px', height: '50px' }} /></td>
+						{/* <td scope="row w-25"><img src={product.img} alt={product.name} style={{ width: '50px', height: '50px' }} /></td> */}
 						<td className='fw-bold'>{product.name}</td>
 						<td>{product.price}</td>
-						<td>{product.total_quantity}</td>
+						<td>{product.countInStock}</td>
 						<td className='fw-bold d-flex gap-2 justify-content-center'>
 
 							<a href="#" className='p-2 rounded-2 fd-bg-primary' onClick={(e) => parseProduct(product)} title='View Product'><i className="bi bi-eye"></i></a>
 							<a href="#" className='p-2 rounded-2 bg-secondary' onClick={(e) => parseProduct(product)} title='Edit'><i className="bi bi-pen"></i></a>
 							<a href="#" className='p-2 rounded-2 bg-danger' title='Delete' onClick={(e) => {
 								e.preventDefault();
-								deleteItem(product.id)
+								deleteItem(product._id)
 							}}><i className="bi bi-trash"></i></a>
 						</td>
 					</tr>
@@ -299,7 +283,8 @@ const ListOfProducts = ({ setProduct, setPage }: { setProduct: Function, setPage
 						{content}
 					</tbody>
 				</table>
-			</div> :
+			</div>
+			 :
 			<Spinner />
 	);
 }

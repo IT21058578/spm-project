@@ -13,10 +13,11 @@ const ViewProduct = () => {
 
   const params = useParams()
 
-  const productId = params.id ? parseInt(params.id, 10) : null; // Handle the case where params.id is undefined
+  // const productId = params.id ? parseInt(params.id, 10) : null;
+  // Handle the case where params.id is undefined
 
   // Find the product with the matching ID in sortProducts array
-  const selectedProduct = sortProducts.find((product) => product.id === productId);
+  // const selectedProduct = sortProducts.find((product) => product.id === productId);
 
   const { isLoading, data : details , isSuccess, isError } = useGetProductQuery(params.id || '');
 
@@ -24,19 +25,19 @@ const ViewProduct = () => {
     <>
         <Header />
         <Banner page="Shop Details" path={["Home", "Shop Details"]}/>
-        {/* {
+        {
           !isLoading && isSuccess ? 
-          <ProductDetails product={details.data}/> 
+          <ProductDetails product={details}/> 
           : 
           (isError ? <NotFound /> : <Spinner />)
-        } */}
+        }
         
         {/* new code for navigating dummy data */}
-        {selectedProduct ? (
+        {/* {selectedProduct ? (
           <ProductDetails product={selectedProduct} />
         ) : (
           <NotFound />
-        )}
+        )} */}
         <Footer />
     </>
   )

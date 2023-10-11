@@ -1,6 +1,7 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 import { BASE_URL } from '../../Utils/Generals';
 
+
 export const authApiSlice = createApi({
     
     reducerPath : 'api/auth',
@@ -10,13 +11,13 @@ export const authApiSlice = createApi({
     endpoints : (builder) => ({
 
         refresh : builder.query(({
-            query : () => '/user/refresh',
+            query : () => '/auth/authorize',
             providesTags : ['Auth']
         })),
 
         login: builder.mutation({
             query : (category) => ({
-                url : `/user/login`,
+                url : `/auth/login`,
                 method : 'POST',
                 body : category,
             }),
@@ -25,7 +26,7 @@ export const authApiSlice = createApi({
 
         register: builder.mutation({
             query : (data) => ({
-                url : 'user/create',
+                url : '/auth/register',
                 method : 'POST',
                 body : data,
             }),

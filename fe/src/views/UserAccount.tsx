@@ -3,15 +3,19 @@ import Header from './includes/Header'
 import Footer from './includes/Footer'
 import { Link, useNavigate } from 'react-router-dom'
 import RoutePaths from '../config'
-import { toggleLinkClass, User, removeItem } from '../Utils/Generals'
+import { toggleLinkClass,removeItem } from '../Utils/Generals'
 import { useUpdateUserMutation } from '../store/apiquery/usersApiSlice'
 import Spinner from '../components/Spinner'
 import { useAppDispatch, useAppSelector } from '../hooks/redux-hooks'
 import LoadingButton from '../components/LoadingButton'
 import { HandleResult } from '../components/HandleResult'
 import Swal from 'sweetalert2'
-import { useGetCommandQuery } from '../store/apiquery/CommandApiSlice'
 import { connect } from 'react-redux'
+import { useGetAllOrderQuery } from '../store/apiquery/OrderApiSlice'
+import { Order } from '../types'
+import { useDeleteOrderMutation } from '../store/apiquery/OrderApiSlice'
+import { logoutCurrentUser } from '../store/userSlice'
+import { UserType } from '../types'
 
 export const UserDashboard = () => {
     return (
@@ -24,9 +28,28 @@ export const UserDashboard = () => {
 
 export const UserOrders = () => {
 
-    const user: User = useAppSelector(state => state.user);
+    const user: UserType = useAppSelector(state => state.user);
     // let content: React.ReactHTMLElement<HTMLElement> = <></>;
-    const { data: commands, isLoading } = useGetCommandQuery(user.id);
+    const { data:reviews, isLoading, isError ,isSuccess } = useGetAllOrderQuery("api/orders");
+
+    const [deleteOrder, deletedResult] = useDeleteOrderMutation();
+
+    const deleteItem = (id: string) => {
+		Swal.fire({
+			title: 'Are you sure?',
+			text: "Are you sure to delete this order ?",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((r) => {
+			if (r.isConfirmed) {
+				deleteOrder(id);
+			}
+		});
+	}
+
 
     // useEffect(() => {
 
@@ -35,6 +58,52 @@ export const UserOrders = () => {
     //     }) : null;
 
     // }, [commands])
+
+    let content: React.ReactNode;
+
+	content = isLoading || isError
+		? null
+		: isSuccess
+			// ? ordersList['data'].map((order: orderType) => {
+			? reviews.content.map((order: Order) => {
+
+				return (
+					<tr className="p-3" key={order._id}>
+						<td className='fw-bold'>{order?._id}</td>
+						<td>
+                        <ul>
+                            {Object.entries(order?.items).map(([productId, item]) => (
+                            <li key={productId}>
+                                Price: {item.price}, Qty: {item.qty}
+                            </li>
+                            ))}
+                        </ul>
+                        </td>
+						<td>Rs {order?.totalPrice.toFixed(2)}</td>
+                        <td>
+                            <span style={{ color: order.deliveryStatus === 'COMPLETED' ? 'green' : 'red' }}>
+                                {order?.deliveryStatus}
+                            </span>
+                        </td>
+                        <td className='fw-bold d-flex gap-2 justify-content-center'>
+                        {order?.deliveryStatus === 'COMPLETED' && (
+                            <a
+                            href="#"
+                            className='p-2 rounded-2 bg-danger'
+                            title='Delete'
+                            onClick={(e) => {
+                                e.preventDefault();
+                                deleteItem(order?._id);
+                            }}
+                            >
+                            <i className="bi bi-trash"></i>
+                            </a>
+                        )}
+                        </td>
+					</tr>
+				)
+			})
+			: null;
 
     return (
         <div className="user-orders p-3 border border-2 text-black">
@@ -45,17 +114,17 @@ export const UserOrders = () => {
                         <table className="table table-default table-bordered text-center">
                             <thead>
                                 <tr>
-                                    <th scope="col">Commande</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Status</th>
+                                    <th scope="col">Order ID</th>
+                                    <th scope="col">Items</th>
                                     <th scope="col">Total</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col">Delivery Status</th>
+                                    <th scope="col">Manage</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
                                     isLoading ? <Spinner /> :
-                                    JSON.stringify(commands.data)
+                                    content
                                 }
                             </tbody>
                         </table> :
@@ -70,14 +139,14 @@ export const UserOrders = () => {
 
 export const UserAddress = () => {
 
-    const user: User = useAppSelector(state => state.user);
+    const user: UserType = useAppSelector(state => state.user);
 
     return (
         <div className="user-address p-3 border border-2 text-black">
             <h3>Billing Address</h3>
             <div className="opacity-75">
-                <h6>{user.address}</h6>
-                <h6><span className="fw-bold">Mobile:</span>(229) {user.phone}</h6>
+                <h6>{user.region} , {user.country}</h6>
+                <h6><span className="fw-bold">Email:</span> {user.email} </h6>
             </div>
         </div>
     )
@@ -85,7 +154,7 @@ export const UserAddress = () => {
 
 export const UserDetails = () => {
 
-    const user: User = useAppSelector(state => state.user);
+    const user: UserType = useAppSelector(state => state.user);
     const [data, setData] = useState(user);
     const [updateUser, result] = useUpdateUserMutation();
 
@@ -103,46 +172,90 @@ export const UserDetails = () => {
 
 
     return (
-        <div className="user-edit-details p-3 border border-2 text-black">
-            <h3>Account Details</h3>
-            <form action="" method="post" className="checkout-service p-3" onSubmit={handleSubmit}>
-                <div className='d-flex gap-2'>
-                    <label className='w-50'>
-                        <span>First Name</span>
-                        <input type="text" name="firstname" className="form-control w-100 rounded-0 p-2" value={data.firstname} onChange={handleChange} />
-                    </label>
-                    <label className='w-50'>
-                        <span>Last Name</span>
-                        <input type="text" name="lastname" className="form-control w-100 rounded-0 p-2" value={data.lastname} onChange={handleChange} />
-                    </label>
-                </div>
-                <div className='my-4'>
-                    <label className='w-100'>
-                        <span>Email</span>
-                        <input type="email" name="email" className="form-control w-100 rounded-0 p-2" value={data.email} onChange={handleChange} />
-                    </label>
-                </div>
-                <div>
-                    <label className='w-100'>
-                        <span>Address</span>
-                        <input type="text" name="address" className="form-control w-100 rounded-0 p-2" value={data.address} onChange={handleChange} />
-                    </label>
-                </div>
-                <div className='my-4'>
-                    <label className='w-100'>
-                        <span>Password</span>
-                        <input type="password" name="password" className="form-control w-100 rounded-0 p-2" value={user.password} onChange={handleChange} />
-                    </label>
-                </div>
-                <div className='my-4'>
-                    <HandleResult result={result} />
-                </div>
-                <LoadingButton loadingState={result.isLoading}>
-                    <div className='mt-4'><button type="submit" className="fd-btn border-0 w-100 text-center">SAVE NOW</button></div>
-                </LoadingButton>
+        // <div className="user-edit-details p-3 border border-2 text-black">
+        //     <h3>Account Details</h3>
+        //     <form action="" method="post" className="checkout-service p-3" onSubmit={handleSubmit}>
+        //         <div className='d-flex gap-2'>
+        //             <label className='w-50'>
+        //                 <span>First Name</span>
+        //                 <input type="text" name="firstname" className="form-control w-100 rounded-0 p-2" value={data.firstName} onChange={handleChange} />
+        //             </label>
+        //             <label className='w-50'>
+        //                 <span>Last Name</span>
+        //                 <input type="text" name="lastname" className="form-control w-100 rounded-0 p-2" value={data.lastName} onChange={handleChange} />
+        //             </label>
+        //         </div>
+        //         <div className='my-4'>
+        //             <label className='w-100'>
+        //                 <span>Email</span>
+        //                 <input type="email" name="email" className="form-control w-100 rounded-0 p-2" value={data.email} onChange={handleChange} />
+        //             </label>
+        //         </div>
+        //         <div>
+        //             <label className='w-100'>
+        //                 <span>Country</span>
+        //                 <input type="text" name="country" className="form-control w-100 rounded-0 p-2" value={data.country} onChange={handleChange} />
+        //             </label>
+        //         </div>
+        //         <div className='my-4'>
+        //             <label className='w-100'>
+        //                 <span>Region</span>
+        //                 <input type="text" name="region" className="form-control w-100 rounded-0 p-2" value={user.region} onChange={handleChange} />
+        //             </label>
+        //         </div>
+        //         <div className='my-4'>
+        //             <HandleResult result={result} />
+        //         </div>
+        //         <LoadingButton loadingState={result.isLoading}>
+        //             <div className='mt-4'><button type="submit" className="fd-btn border-0 w-100 text-center">SAVE NOW</button></div>
+        //         </LoadingButton>
 
-            </form>
+        //     </form>
+        // </div>
+
+    <div className="container">
+         <div className="card border-0 shadow-lg">
+            <h3 className="card-header bg-primary text-white">Account Details</h3>
+            <div className="card-body">
+            <div className="row">
+                <div className="col-6">
+                <div className="mb-3">
+                    <label className="form-label text-primary">First Name</label>
+                    <div className="form-control-plaintext">{data.firstName}</div>
+                </div>
+                </div>
+                <div className="col-6">
+                <div className="mb-3">
+                    <label className="form-label text-primary">Last Name</label>
+                    <div className="form-control-plaintext">{data.lastName}</div>
+                </div>
+                </div>
+            </div>
+            <div className="mb-3">
+                <label className="form-label text-primary">Email</label>
+                <div className="form-control-plaintext">{data.email}</div>
+            </div>
+            <div className="row">
+                <div className="col-6">
+                <div className="mb-3">
+                    <label className="form-label text-primary">Country</label>
+                    <div className="form-control-plaintext">{data.country}</div>
+                </div>
+                </div>
+                <div className="col-6">
+                <div className="mb-3">
+                    <label className="form-label text-primary">Region</label>
+                    <div className="form-control-plaintext">{user.region}</div>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div className="card-footer">
+            </div>
         </div>
+    </div>
+     
+        
     )
 }
 
@@ -155,7 +268,7 @@ const UserAccount = ({ currentComponent = <UserDashboard /> }: { currentComponen
         e.preventDefault();
         Swal.fire({
             title: 'Are you sure?',
-            text: "Are you sure to delete this product ?",
+            text: "Are you sure to delete this order ?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -165,7 +278,7 @@ const UserAccount = ({ currentComponent = <UserDashboard /> }: { currentComponen
             if (r.isConfirmed) {
                 removeItem(RoutePaths.token);
                 removeItem('user');
-                // dispatch(logoutCurrentUser)
+                dispatch(logoutCurrentUser)
                 navigate(RoutePaths.home)
             }
         })

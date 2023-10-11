@@ -1,22 +1,33 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 import { ProductType } from '../../components/ProductCart';
 import { BASE_URL } from '../../Utils/Generals';
+import { getItem } from '../../Utils/Generals';
+import RoutePaths from '../../config';
+
+const token = getItem(RoutePaths.token);
+
 
 export const productApiSlice = createApi({
     
     reducerPath : 'api/products',
-    baseQuery : fetchBaseQuery({baseUrl : BASE_URL}),
+    baseQuery : fetchBaseQuery({baseUrl : BASE_URL ,
+        prepareHeaders(headers) {
+            if (token) {
+              headers.set('Authorization', `Bearer ${token}`);
+            }
+            return headers;
+          },}),
     tagTypes : ['Products'],
 
     endpoints : (builder) => ({
 
         getAllProducts : builder.query(({
-            query : () => '/product',
+            query : () => '/products/search',
             providesTags : ['Products']
         })),
 
         getProduct : builder.query({
-            query : (id : string) => `/product/${id}`,
+            query : (id : string) => `/products/${id}`,
             providesTags : ['Products']
         }),
 
@@ -36,31 +47,43 @@ export const productApiSlice = createApi({
         }),
 
         createProduct: builder.mutation({
-            query : (product) => ({
-                url : `/product/create`,
+            query : ({product}) => ({
+                url : '/products',
                 method : 'POST',
-                body : product,
+                body : product
             }),
            invalidatesTags : ['Products']
         }),
 
         updateProduct: builder.mutation({
-            query : (data) => ({
-                url : 'product/edit',
-                method : 'POST',
-                body : data,
+            query : ({productId,form}) => ({
+                url : `/products/${productId}`,
+                method : 'PUT',
+                body : form,
             }),
             invalidatesTags : ['Products']
         }),
 
         deleteProduct: builder.mutation({
-            query : (id : number) => ({
-                url : '/product/delete',
+            query : ({id}) => ({
+                url : `/products/${id}`,
                 method : 'DELETE',
-                body : {id}
             }),
             invalidatesTags : ['Products']
-        })
+        }),
+
+        downloadProductReports: builder.query(({
+            query : () => '/products/reports',
+            providesTags : ['Products']
+        })),
+
+        uploadImages:builder.mutation({
+            query: ({formData}) => ({
+              url: '/products/images',
+              method: 'POST',
+              body: formData
+            }),
+          }), 
     })
 })
 
@@ -74,4 +97,6 @@ export const {
     useUpdateProductMutation,
     useCreateProductMutation,
     useDeleteProductMutation,
+    useDownloadProductReportsQuery,
+    useUploadImagesMutation
  } = productApiSlice;

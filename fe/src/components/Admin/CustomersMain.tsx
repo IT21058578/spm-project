@@ -2,6 +2,8 @@ import React from 'react'
 import Swal from 'sweetalert2';
 import { useDeleteUserMutation, useGetAllUsersQuery } from '../../store/apiquery/usersApiSlice';
 import Spinner from '../Spinner';
+import { UserType } from '../../types';
+import { useAppSelector } from '../../hooks/redux-hooks'
 
 const ListOfCustomers = () => {
 
@@ -10,7 +12,7 @@ const ListOfCustomers = () => {
   const { isLoading, data: customersList, isSuccess, isError } = useGetAllUsersQuery('api/users');
   const [deleteCustomer, deletedResult] = useDeleteUserMutation();
 
-  const deleteItem = (id: number) => {
+  const deleteItem = (id: string) => {
     Swal.fire({
       title: 'Are you sure?',
       text: "Are you sure to delete this customer ?",
@@ -30,22 +32,22 @@ const ListOfCustomers = () => {
 
   content = isLoading || isError
     ? null
-    : isSuccess
-      ? customersList['data'].map((customer: any) => {
+    : isSuccess && customersList && customersList.content
+      ? customersList.content.map((customer: UserType) => {
+        const customerId = customer._id || '';
 
         return (
-          <tr className="p-3" key={customer.id}>
+          <tr className="p-3" key={customer._id}>
             <td scope="row w-25">{++count}</td>
-            <td className='fw-bold'>{customer.firstname}</td>
-            <td className='fw-bold'>{customer.lastname}</td>
+            <td className='fw-bold'>{customer.firstName}</td>
+            <td className='fw-bold'>{customer.lastName}</td>
             <td>{customer.email}</td>
-            <td>{customer.address}</td>
-            <td>{15}</td>
+            <td>{customer.region}</td>
+            <td>{customer.country}</td>
             <td className='fw-bold d-flex gap-2 justify-content-center'>
-              <a href="#" className='p-2 rounded-2 bg-secondary' title='Block Customer'><i className="bi bi-person-x"></i></a>
               <a href="#" className='p-2 rounded-2 bg-danger' title='Delete' onClick={(e) => {
                 e.preventDefault();
-                deleteItem(customer.id)
+                deleteItem(customerId)
               }}><i className="bi bi-trash"></i></a>
             </td>
           </tr>
@@ -54,19 +56,18 @@ const ListOfCustomers = () => {
       : null;
 
 
-
   return (
     !isLoading ?
       <div className="table-responsive">
         <table className="table table-default text-center table-bordered">
           <thead>
             <tr className='fd-bg-primary text-white'>
-              <th scope="col" className='p-3'>N°</th>
+              <th scope="col" className='p-3'>No</th>
               <th scope="col" className='p-3'>FIRSTNAME</th>
               <th scope="col" className='p-3'>LASTNAME</th>
               <th scope="col" className='p-3'>EMAIL</th>
-              <th scope="col" className='p-3'>ADDRESS</th>
-              <th scope="col" className='p-3'>TOTAL ORDERS</th>
+              <th scope="col" className='p-3'>REGION</th>
+              <th scope="col" className='p-3'>COUNTRY</th>
               <th scope="col" className='p-3'>ACTION</th>
             </tr>
           </thead>

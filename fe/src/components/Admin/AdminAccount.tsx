@@ -1,8 +1,9 @@
 import React, { useState } from "react"
+import { UserType } from "../../types";
+import { useAppSelector } from "../../hooks/redux-hooks";
+
 
 const AddAccount = () => {
-
-    
 
     return (
         <form action="/" method="post" className="admin-profile p-3 mb-5">
@@ -61,7 +62,7 @@ const AdminDetails = () => {
             <div className='d-flex gap-2'>
                 <label className='w-50'>
                     <span>First Name</span>
-                    <input type="text" name="firstname" className="form-control w-100 rounded-2 p-2" value='ELFRIED' disabled />
+                    <input type="text" name="firstname" className="form-control w-100 rounded-2 p-2" value='KIDJE' disabled />
                 </label>
                 <label className='w-50'>
                     <span>Last Name</span>
@@ -138,27 +139,83 @@ const AdminAccount = () => {
     const changeToList = () => { setPage('add'); }
     const changeToAdd = () => { setPage('list'); }
 
+    const user: UserType = useAppSelector(state => state.user);
+    console.log(user?._id);
+    const [data, setData] = useState(user);
+
     return (
-        <div className='text-black'>
-            <h4 className="fw-bold">Profile</h4>
-            <div className="add-product my-3 d-flex justify-content-end">
-                {
-                    page === 'list' ?
-                        <a href="#" className="fd-btn bg-secondary w-25 text-center rounded-3" onClick={changeToList}>ADD ACCOUNT</a> :
-                        <a href="#" className="fd-btn bg-secondary w-25 text-center rounded-3" onClick={changeToAdd}>PROFILE</a>
-                }            </div>
-            <div className="subPartMain">
-                {page === 'list' ?
-                    <>
-                        <AdminDetails />
-                        <hr />
-                        <h4 className="mt-5">List Of All Admins</h4>
-                        <AdminList />
-                    </>
-                :
-                    <AddAccount />
-                }
+        // <div className='text-black'>
+        //     <h4 className="fw-bold">Profile</h4>
+        //     <div className="add-product my-3 d-flex justify-content-end">
+        //         {
+        //             page === 'list' ?
+        //                 <a href="#" className="fd-btn bg-secondary w-25 text-center rounded-3" onClick={changeToList}>ADD ACCOUNT</a> :
+        //                 <a href="#" className="fd-btn bg-secondary w-25 text-center rounded-3" onClick={changeToAdd}>PROFILE</a>
+        //         }            </div>
+        //     <div className="subPartMain">
+        //         {page === 'list' ?
+        //             <>
+        //                 <AdminDetails />
+        //                 <hr />
+        //                 <h4 className="mt-5">List Of All Admins</h4>
+        //                 <AdminList />
+        //             </>
+        //         :
+        //             <AddAccount />
+        //         }
                 
+        //     </div>
+        // </div>
+        <div className="container">
+                <div className="card border-0 shadow-lg">
+                <h3 className="card-header bg-primary text-white">Account Details</h3>
+                <div className="card-body">
+                <div className="row">
+                    <div className="col-6">
+                    <div className="mb-3">
+                        <label className="form-label text-primary">First Name</label>
+                        <div className="form-control-plaintext">{data.firstName}</div>
+                    </div>
+                    </div>
+                    <div className="col-6">
+                    <div className="mb-3">
+                        <label className="form-label text-primary">Last Name</label>
+                        <div className="form-control-plaintext">{data.lastName}</div>
+                    </div>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-6">
+                    <div className="mb-3">
+                        <label className="form-label text-primary">Email</label>
+                        <div className="form-control-plaintext">{data.email}</div>
+                    </div>
+                    </div>
+                    <div className="col-6">
+                    <div className="mb-3">
+                        <label className="form-label text-primary">Role</label>
+                        <div className="form-control-plaintext">{data.roles}</div>
+                    </div>
+                    </div>
+                </div>
+            
+                <div className="row">
+                    <div className="col-6">
+                    <div className="mb-3">
+                        <label className="form-label text-primary">Country</label>
+                        <div className="form-control-plaintext">{data.country}</div>
+                    </div>
+                    </div>
+                    <div className="col-6">
+                    <div className="mb-3">
+                        <label className="form-label text-primary">Region</label>
+                        <div className="form-control-plaintext">{user.region}</div>
+                    </div>
+                    </div>
+                </div>
+                </div>
+                <div className="card-footer">
+                </div>
             </div>
         </div>
     )

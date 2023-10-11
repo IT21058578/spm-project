@@ -35,7 +35,7 @@ const ViewCart = ({setShow} : {setShow : Function}) => {
                 <h4 className="fw-bold w-100">SHOPPING CART <span className="float-end cursor-pointer" onClick={hideCart}><i className="bi bi-x"></i></span></h4><hr />
                 <div className="h-50 overflow-auto">
                     { productCart && productCart.length > 0 ?
-                        productCart.map(product => <SimpleProduct product = {product} key={product.id} />) :
+                        productCart.map(product => <SimpleProduct product = {product} key={product._id} />) :
                         <h6 className="opacity-50 text-center">No Product in Cart.</h6>
                     }
                 </div><hr />

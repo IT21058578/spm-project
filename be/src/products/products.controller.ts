@@ -41,7 +41,7 @@ export class ProductsController {
   }
 
   @Get('reports')
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.ADMIN)
   @Header('Content-Type', 'application/pdf')
   @Header(
     'Content-Disposition',
@@ -77,14 +77,14 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteProduct(@Param('id') id: string) {
     await this.productsService.deleteProduct(id);
   }
 
   @Post()
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   async createProduct(@Body() createProductsDto: CreateProductDto) {
     return await this.productsService.createProduct(createProductsDto);

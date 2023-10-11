@@ -4,7 +4,6 @@ import { useCreateSlideMutation, useDeleteSlideMutation, useGetAllSlidesQuery, u
 import { HandleResult } from '../HandleResult';
 import Swal from 'sweetalert2';
 import Spinner from '../Spinner';
-import { link } from '../../Utils/Generals';
 
 let imageIsChanged = false;
 
@@ -43,7 +42,7 @@ const UpdateSlide = ({ slide }: { slide: Slide }) => {
     <form action="" method="post" className="checkout-service p-3" onSubmit={handleSubmit}>
       	<input type="hidden" name="id" value={slide.id}/>
       <div className="w-100 mx-auto p-3 border border-1 rounded-5 fd-hover-border-primary" style={{ height: '450px' }}>
-        <img src={link(slide.image)} alt={slide.text} className='w-100 h-100' ref={imageTag}/>
+        <img src={slide.image} alt={slide.text} className='w-100 h-100' ref={imageTag}/>
       </div>
       <div className='mt-4'>
         <label className='w-100'>
@@ -168,7 +167,7 @@ const ListOfSlides = ({ setSlide, setPage }: { setSlide: Function, setPage: Func
 
         return (
           <tr className="p-3" key={slide.image}>
-            <td scope="row w-25"><img src={link(slide.image)} alt={slide.text} style={{ width: '100px', height: '50px' }} /></td>
+            <td scope="row w-25"><img src={slide.image} alt={slide.text} style={{ width: '100px', height: '50px' }} /></td>
             <td>{slide.text}</td>
             <td className='fw-bold d-flex gap-2 justify-content-center'>
 

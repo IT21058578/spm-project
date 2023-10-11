@@ -8,7 +8,7 @@ const AddToWishlist = ({ product, classSup = '', supStyle }: { product: ProductT
 
   const dispatch = useAppDispatch();
   const exist : ProductType[] = useAppSelector((state) => state.productWishlist);
-  const isExistInWishlist = exist.find((stateProduct) => stateProduct.id == product.id);
+  const isExistInWishlist = exist.find((stateProduct) => stateProduct._id == product._id);
 
   return <>
     <a className={"fd-btn cursor-pointer " + classSup} style={supStyle}>

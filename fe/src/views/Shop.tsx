@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Header from './includes/Header'
 import Footer from './includes/Footer'
 import Banner from '../components/Banner'
-import { Category, PopularProducts, SortProducts } from './includes/Section'
+import { Category, PopularProducts , SortProducts} from './includes/Section'
 import SearchBar from '../components/SearchBar'
 import { CategoryType } from './VirtualData'
 import Tags from '../components/Tags'
@@ -10,17 +10,31 @@ import Archives from '../components/Archives'
 import { useGetAllCategoriesQuery } from '../store/apiquery/categoryApiSlice';
 import Spinner from '../components/Spinner'
 import { apiCategory } from './VirtualData'
+import { useGetAllProductsQuery } from '../store/apiquery/productApiSlice'
 
 
 const Shop = () => {
 
-  const {isLoading, data : categoryList, isError }  = useGetAllCategoriesQuery("api/categories");
+  // const {isLoading, data : categoryList, isError }  = useGetAllCategoriesQuery("api/categories");
 
 
   const [type, setType] = useState('grid');
 
+  const isError = false;
+
   const changeTypeToGrid = () => { setType('grid'); }
   const changeTypeToList = () => { setType('list'); }
+
+  const { data: products, isLoading } = useGetAllProductsQuery("api/products");
+
+  const currentPage = products?.metadata.pageNum;
+  const itemsPerPage = products?.metadata.pageSize;
+  const totalProducts = products?.metadata.totalDocuments;
+  
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, totalProducts);
+  
+  const displayedDataCount = endIndex - startIndex;
 
   return (
     <>
@@ -37,7 +51,7 @@ const Shop = () => {
                   <i className="bi bi-list-task"></i>
                 </span>
               </div>
-              <h5 className="fw-bold d-none d-lg-block">Showing 1-17 of 18 Result</h5>
+              <h5 className="fw-bold d-none d-lg-block">Showing {displayedDataCount} of {products?.content.length} Result</h5>
               <nav className="dropdown">
                 <a href="#" className="dropdown-toggle fd-btn bg-white text-black" data-bs-toggle='dropdown' data-bs-auto-close='outside'>Default Sorting</a>
                 <div className="dropdown-menu rounded-0 text-start animate__animated animate__fadeIn">
@@ -57,7 +71,7 @@ const Shop = () => {
             <div className="category-list text-black bg-white w-100 border border-1 fd-hover-border-primary p-3 my-5">
               <h5>Categories</h5><hr />
               <div className="d-flex flex-column gap-2">
-              { !isLoading && !isError ? 
+              {!isError ? 
                 <div className="category-list d-flex flex-column gap-4 py-2 px-3">
                   {
                     // categoryList['data'].map((category : CategoryType) => <Category category={category} key={category.id}/>)
