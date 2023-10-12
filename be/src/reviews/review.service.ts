@@ -22,7 +22,7 @@ export class ReviewService {
   ): Promise<ReviewDocument> {
     this.logger.log('Creating new review...');
     const createdReview = new this.reviewModel({
-      reviewDto,
+      ...reviewDto,
       createdBy,
       createdAt: new Date(),
     });

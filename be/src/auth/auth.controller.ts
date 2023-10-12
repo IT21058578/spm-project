@@ -57,7 +57,7 @@ export class AuthController {
   }
 
   @Put('password/change')
-  @Roles(UserRole.USER)
+  @Roles(...Object.values(UserRole))
   async changeUserPassword(
     @User('email') email: string,
     @Body() { password, oldPassword }: ChangePasswordRequestDto,

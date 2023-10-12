@@ -63,15 +63,15 @@ export class OrdersService {
   }
 
   async editOrderDeliveryStatus(id: string, deliveryStatus: DeliveryStatus) {
-    const updatedOrder = await this.orderModel.findByIdAndUpdate(id, {
-      deliveryStatus,
-    });
+    const orderToUpdate = await this.getOrder(id);
 
-    if (updatedOrder === null) {
+    if (orderToUpdate === null) {
       throw new BadRequestException(ErrorMessage.PRODUCT_NOT_FOUND, {
         description: `Product with id '${id}' was not found`,
       });
     }
+    orderToUpdate.deliveryStatus = deliveryStatus;
+    const updatedOrder = await orderToUpdate.save();
     return updatedOrder;
   }
 

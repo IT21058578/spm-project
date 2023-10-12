@@ -41,7 +41,6 @@ export class ProductsController {
   }
 
   @Get('reports')
-  // @Roles(UserRole.ADMIN)
   @Header('Content-Type', 'application/pdf')
   @Header(
     'Content-Disposition',
