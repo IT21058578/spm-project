@@ -300,7 +300,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
             <span>Image</span>
             <input
               type="file"
-              name="image"
+              name="images"
               value={formData.images}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Product Image"
@@ -413,6 +413,8 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
 
 };
 
+
+
 const ListOfProducts = ({
   setProduct,
   setPage,
@@ -456,7 +458,7 @@ const ListOfProducts = ({
       ? null
       : isSuccess
       ? productsList.content.map((product: ProductType) => {
-       const  productId = product._id;
+       const  productId = product?._id;
           // ? sortProducts.map((product: ProductType) => {
 
           return (

@@ -25,10 +25,10 @@ export const authApiSlice = createApi({
         }),
 
         register: builder.mutation({
-            query : (data) => ({
+            query : (userDto) => ({
                 url : '/auth/register',
                 method : 'POST',
-                body : data,
+                body : userDto,
             }),
             invalidatesTags : ['Auth']
         })

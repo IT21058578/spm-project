@@ -2,6 +2,10 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 import { BASE_URL } from '../../Utils/Generals';
 import { getItem } from '../../Utils/Generals';
 import RoutePaths from '../../config';
+import { useState } from 'react';
+
+const isLogged = getItem(RoutePaths.token);
+const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const token = getItem(RoutePaths.token);
 
@@ -26,29 +30,32 @@ export const orderApiSlice = createApi({
         })),
 
         createOrder: builder.mutation({
-            query : ({ userId,data,deliveryStatus,totalPrice}) => ({
+            query : (createOrderDto) => ({
                 url : '/Orders',
                 method : 'POST',
-                user : userId,
-                body : {data},
+                body : {createOrderDto},
+                headers: {
+                    userId: `Bearer ${user._id}`,
+                  },
             }),
            invalidatesTags : ['Order']
         }),
 
         updateOrder: builder.mutation({
-            query : ({data,token}) => ({
+            query : (data) => ({
                 url : '/Orders/edit',
                 method : 'POST',
                 body : {data},
+
             }),
             invalidatesTags : ['Order']
         }),
 
         updateOrderStatus: builder.mutation({
-            query : ({id,deliveryStatus}) => ({
+            query : ({id,formData}) => ({
                 url : `/Orders/${id}`,
                 method : 'PUT',
-                params: {deliveryStatus},
+                params: {formData},
                 
             }),
             invalidatesTags : ['Order']

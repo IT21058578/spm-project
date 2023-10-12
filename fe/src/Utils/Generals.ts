@@ -65,7 +65,7 @@ export const buildCheckoutData = () => {
     });
   });
 
-  return { items: checkoutData , totalPrice:TotalPrice , deliveryStatus:DeliveryStatus };
+  return {items: checkoutData , totalPrice:TotalPrice , deliveryStatus:DeliveryStatus };
 };
 
 export const BASE_URL = "http://localhost:3000"; // BASE URL FOR API FETCHING

@@ -50,8 +50,7 @@ export class OrdersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.USER)
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.USER)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteOrders(@Param('id') id: string) {
     await this.ordersService.deleteOrder(id);
@@ -59,17 +58,16 @@ export class OrdersController {
   }
 
   @Put(':id')
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.ADMIN)
   async editOrderDeliveryStatus(
-    @Param('id') id: string,
+    @Param('_id') id: string,
     @Query('delivery-status') deliveryStatus: DeliveryStatus,
   ) {
     return await this.ordersService.editOrderDeliveryStatus(id, deliveryStatus);
   }
 
   @Post()
-  @Roles(UserRole.USER)
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.USER)
   @HttpCode(HttpStatus.CREATED)
   async createOrders(
     @User('_id') userId: string,

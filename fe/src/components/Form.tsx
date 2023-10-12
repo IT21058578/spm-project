@@ -5,6 +5,8 @@ import { HandleResult } from "./HandleResult";
 import LoadingButton from "./LoadingButton";
 import RoutePaths from "../config";
 import { checkLogin } from "../Utils/Generals";
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
 
@@ -74,37 +76,84 @@ const LoginForm = () => {
 }
 
 const SignUpForm = () => {
+    const navigate = useNavigate();
 
     if (checkLogin()) {
     
         return <Navigate to={RoutePaths.userAccount} replace />
     }
 
-    const [data, setData] = useState({});
+    // const [data, setData] = useState({});
     const [sendUserInfo] = useRegisterMutation();
 
-    const handleChange = ( e : SyntheticEvent) => {
+    // const handleChange = ( e : SyntheticEvent) => {
 
-        const target = e.target as HTMLInputElement
+    //     const target = e.target as HTMLInputElement
 
-        setData({...data, [target.name]: target.value });
-    }
+    //     setData({...data, [target.name]: target.value });
+    // }
 
-    const handleSubmit = async (e : SyntheticEvent) => {
+    // const handleSubmit = async (e : SyntheticEvent) => {
 
-        e.preventDefault();
-        try {
-            const response = await sendUserInfo(data);
+    //     e.preventDefault();
+    //     try {
+    //         const response = await sendUserInfo(data);
     
-            if (!("error" in response)) {
-                // Registration was successful, navigate to the login form
-                return <Navigate to={RoutePaths.login} replace />
-            }
+    //         if (!("error" in response)) {
+    //             // Registration was successful, navigate to the login form
+    //             return <Navigate to={RoutePaths.login} replace />
+    //         }
+    //     } catch (error) {
+    //         // Handle errors here, if necessary
+    //         console.error("An error occurred during registration:", error);
+    //     }
+    // }
+
+    const [userDto, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        region: '',
+        country: '',
+        password: '',
+      });
+    
+      const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData({ ...userDto, [name]: value });
+      };
+    
+      const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+    
+        try {
+          const result = await sendUserInfo(userDto);
+          console.log('Registration successfull');
+          toast.success("Registration successfully");
+          setTimeout(() => {
+            navigate('/login', { replace: true });
+          }, 2000);
+    
+          if ('data' in result && result.data) {
+            console.log('Registration successfull');
+            toast.success("Registration successfully");
+            setFormData({         
+                firstName: '',
+                lastName: '',
+                email: '',
+                region: '',
+                country: '',
+                password: ''});
+            return <Navigate to={RoutePaths.login} replace />
+          } else if ('error' in result && result.error) {
+            console.error('Registration failed', result.error);
+            toast.error("Registration failed");
+          }
         } catch (error) {
-            // Handle errors here, if necessary
-            console.error("An error occurred during registration:", error);
+          console.error('Registration failed`', error);
+          toast.error("Registration failed");
         }
-    }
+      };
 
     return (
         <div className="login-form  bg-white shadow col-11 col-lg-4 mx-auto my-5 text-black p-3" style={{ minHeight: '500px' }}>
@@ -118,36 +167,38 @@ const SignUpForm = () => {
                 <div className="my-4">
                     <div className="d-flex w-100 gap-2">
                         <label className="w-50">
-                            <span>Firstname :</span> <input type="text" name="firstname" className="form-control rounded-0 p-2" onChange={handleChange}/>
+                            <span>Firstname :</span> <input type="text" value={userDto.firstName} name="firstName" placeholder="Enter Firt Name"className="form-control rounded-0 p-2" onChange={handleChange}/>
                         </label>
                         <label className="w-50">
-                            <span>Lastname :</span> <input type="text" name="lastname" className="form-control rounded-0 p-2" onChange={handleChange}/>
+                            <span>Lastname :</span> <input type="text" value={userDto.lastName} name="lastName" placeholder="Enter Last Name" className="form-control rounded-0 p-2" onChange={handleChange}/>
                         </label>
                     </div>
                     <div className="username w-100">
                         <label className="w-100 mt-4">
-                            <span>Email :</span> <input type="email" name="email" className="form-control rounded-0 p-2" onChange={handleChange}/>
+                            <span>Email :</span> <input type="email" value={userDto.email} name="email" placeholder="Enter Email" className="form-control rounded-0 p-2" onChange={handleChange}/>
                         </label>
                     </div>
                     <div className="d-flex w-100 gap-2 mt-4">
                         <label className="w-50">
-                            <span>Address :</span> <input type="text" name="address" className="form-control rounded-0 p-2" onChange={handleChange}/>
+                            <span>Region :</span> <input type="text" value={userDto.region} name="region" placeholder="Enter Region" className="form-control rounded-0 p-2" onChange={handleChange}/>
                         </label>
                         <label className="w-50">
-                            <span>Phone :</span> <input type="text" name="phone" className="form-control rounded-0 p-2" onChange={handleChange}/>
+                            <span>Country :</span> <input type="text" value={userDto.country} name="country" placeholder="Enter Country" className="form-control rounded-0 p-2" onChange={handleChange}/>
                         </label>
                     </div>
                     <div className="user-pass my-4">
                         <label className="w-100">
-                            <span>Password :</span> <input type="password" name="password" className="form-control rounded-0 p-2" onChange={handleChange}/>
+                            <span>Password :</span> <input type="password" value={userDto.password} name="password" placeholder="Create New Password" className="form-control rounded-0 p-2" onChange={handleChange}/>
                         </label>
                     </div>
                     <div className="user-pass my-4">
                         <label className="w-100">
-                            <span>Confirm Password :</span> <input type="password" name="password_confirmation" className="form-control rounded-0 p-2" onChange={handleChange}/>
+                            <span>Confirm Password :</span> <input type="password" name="password_confirmation" className="form-control rounded-0 p-2" />
                         </label>
                     </div>
-                    {/* <HandleResult result={result} /> */}
+                    <div className="mt-4">
+                        <ToastContainer/>
+                    </div>
                     <div className="submit text-center my-4">
                         {/* <LoadingButton loadingState={result.isLoading}> */}
                             <button type="submit" className="w-100 border-0 fd-btn">REGISTER</button>

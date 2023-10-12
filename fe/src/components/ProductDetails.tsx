@@ -33,6 +33,10 @@ const ProductDetails = ({product} : {product : ProductType}) => {
     // Filter reviews for the specific product
   const filteredReviews = reviews?.content.filter((review: Review) => review.productId === product._id) || [];
 
+  console.log('Reviews:', reviews);
+  console.log('Product ID:', product._id);
+
+
     // Calculate the average rating
   const totalRating = filteredReviews.reduce((sum:any, review:any) => sum + review.rating, 0);
   const averageRating = filteredReviews.length > 0 ? totalRating / filteredReviews.length : 0;

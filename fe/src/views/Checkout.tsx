@@ -17,7 +17,7 @@ const Checkout = () => {
     const isLogged = getItem(RoutePaths.token);
     const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
-    const data = buildCheckoutData();
+    const createOrderDto = buildCheckoutData();
     const [sendData, result] = useCreateOrderMutation();
 
     const token = getItem(RoutePaths.token);
@@ -28,7 +28,7 @@ const Checkout = () => {
     const submitCheckout = (e : SyntheticEvent) => {
 
         e.preventDefault();
-        sendData({userId,data}); 
+        sendData(createOrderDto); 
     }
 
 

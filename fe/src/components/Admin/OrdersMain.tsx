@@ -6,7 +6,7 @@ import { Order } from '../../types';
 import { useUpdateOrderStatusMutation } from '../../store/apiquery/OrderApiSlice';
 import { useDeleteOrderMutation } from '../../store/apiquery/OrderApiSlice';
 import { useGetAllOrderQuery } from '../../store/apiquery/OrderApiSlice';
-
+import { ToastContainer, toast } from "react-toastify";
 
 
 const UpdateOrders = ({Orders}: {Orders : Order}) => {
@@ -16,23 +16,53 @@ const UpdateOrders = ({Orders}: {Orders : Order}) => {
 
   const orderID = Orders._id;
   console.log("After:", orderID);
+  const oID = orderID.toString();
   
 
-	const handleSubmit = (e: SyntheticEvent) => {
+	// const handleSubmit = (e: SyntheticEvent) => {
 
-		e.preventDefault();
-		const form = new FormData(e.target as HTMLFormElement);
+	// 	e.preventDefault();
+	// 	const form = new FormData(e.target as HTMLFormElement);
 
-		updateOrders({id:orderID,deliveryStatus:form});
+	// 	updateOrders({id:orderID,deliveryStatus:form});
 
-	}
+	// }
 
-  const handleUpdateValue = (e: SyntheticEvent) => {
+  // const handleUpdateValue = (e: SyntheticEvent) => {
 
-		const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-		setUpdateData(values => ({ ...values, [target.name]: target.value}));
+	// 	const target = e.target as HTMLInputElement | HTMLTextAreaElement;
+	// 	setUpdateData(values => ({ ...values, [target.name]: target.value}));
 
-	}
+	// }
+
+  const [formData, setFormData] = useState({
+    deliveryStatus: updateData.deliveryStatus,
+  });
+
+  const handleUpdateValue = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const result = await updateOrders({orderID,formData});
+
+      if ('data' in result && result.data) {
+        console.log('Order States Updated successfully');
+        toast.success("Order States Updated successfully");
+        setFormData({ deliveryStatus : '' });
+      } else if ('error' in result && result.error) {
+        console.error('Order States Update failed', result.error);
+        toast.error("Order States Update failed");
+      }
+    } catch (error) {
+      console.error('Order States Update failed`', error);
+      toast.error("Order States Update failed");
+    }
+  };
   
 
 	return (
@@ -41,12 +71,12 @@ const UpdateOrders = ({Orders}: {Orders : Order}) => {
       <div>
           <label className='w-100'>
             <span>Order Status</span>
-            <input type="text" name="delivery-Status" value={updateData.deliveryStatus} className="form-control w-100 rounded-0 p-2" placeholder='Orders Status' onChange={handleUpdateValue}/>
+            <input type="text" name="deliveryStatus" value={formData.deliveryStatus} className="form-control w-100 rounded-0 p-2" placeholder='Orders Status' onChange={handleUpdateValue}/>
           </label>
         </div>
-			<div className='mt-4'>
-				<HandleResult result={udpateResult}/>
-			</div>
+        <div className="mt-4">
+          <ToastContainer/>
+        </div>
 			<div className='mt-3'>{udpateResult.isLoading ?
 				<button className="fd-btn w-25 text-center border-0"><span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
 					Loading...</button> :
