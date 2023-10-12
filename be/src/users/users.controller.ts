@@ -28,6 +28,7 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteReview(@Param('id') id: string) {
     await this.usersService.deleteUser(id);
+    return;
   }
 
   @Get('reports')

@@ -52,7 +52,7 @@ export const usersApiSlice = createApi({
         }),
 
         deleteUser: builder.mutation({
-            query : ({id}) => ({
+            query : (id : String) => ({
                 url : `/users/${id}`,
                 method : 'DELETE',
             }),

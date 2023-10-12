@@ -435,7 +435,7 @@ const ListOfProducts = ({
     setPage("add");
   };
 
-  const deleteItem = (id: string) => {
+  const deleteItem = (id: string ) => {
     Swal.fire({
       title: "Are you sure?",
       text: "Are you sure to delete this product ?",
@@ -458,7 +458,7 @@ const ListOfProducts = ({
       ? null
       : isSuccess
       ? productsList.content.map((product: ProductType) => {
-       const  productId = product?._id;
+
           // ? sortProducts.map((product: ProductType) => {
 
           return (
@@ -497,7 +497,7 @@ const ListOfProducts = ({
                   title="Delete"
                   onClick={(e) => {
                     e.preventDefault();
-                    deleteItem(productId);
+                    deleteItem(product._id);
                   }}
                 >
                   <i className="bi bi-trash"></i>

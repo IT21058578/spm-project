@@ -73,7 +73,7 @@ export class ProductsService {
 
   async deleteProduct(id: string) {
     this.logger.log(`Attempting to delete product with id '${id}'`);
-    const deletedProduct = await this.productModel.findById(id);
+    const deletedProduct = await this.productModel.findByIdAndDelete(id);
 
     if (deletedProduct === null) {
       this.logger.warn(`Could not find product with id '${id}'`);

@@ -81,7 +81,9 @@ export class ProductsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteProduct(@Param('id') id: string) {
     await this.productsService.deleteProduct(id);
+    return;
   }
+
 
   @Post()
   @Roles(UserRole.ADMIN)
