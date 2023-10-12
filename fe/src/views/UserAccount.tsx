@@ -36,6 +36,8 @@ export const UserOrders = () => {
     const { data:reviews, isLoading, isError ,isSuccess } = useGetAllOrderQuery("api/orders");
     const [data, setData] = useState(user);
 
+    console.log(data._id)
+
     const filteredOrders = reviews?.content.filter((review:Order ) => review.userId === data._id) || [];
 
     const [deleteOrder, deletedResult] = useDeleteOrderMutation();

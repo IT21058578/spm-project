@@ -142,7 +142,6 @@ const ProductDetails = ({product} : {product : ProductType}) => {
 
                   <div>
                     <div>
-                    <h1>Submit a Review</h1>
                     {data._id && <ReviewForm userId={data._id} ProductId={product._id}/>}
                     </div>
                     {filteredReviews.length === 0 ? (
@@ -160,7 +159,7 @@ const ProductDetails = ({product} : {product : ProductType}) => {
                             }}
                         >
                             <div className="rating">{review.rating} stars</div>
-                            <p className="review-description">{review.description}</p>
+                            <p className="review-description" style={{ color: 'darkblue' }}>{review.description}</p>
                         </div>
                         ))
                     )}

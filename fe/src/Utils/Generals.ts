@@ -44,29 +44,29 @@ export const checkLogin = () => {
   return !!isLogged;
 };
 
-type CheckOut = { product_id: string; quantity?: number };
+type CheckOut = { [productId: string]: number };
 
 export const buildCheckoutData = () => {
   const products = useAppSelector((state) => state.productCart);
   const isLogged = getItem(RoutePaths.token);
   const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
-  const total = getTotal(); 
-  const TotalPrice =total.toString();
+  const checkoutData: CheckOut = {};
 
-  const DeliveryStatus = "COMPLETED";
-
-  let checkoutData: CheckOut[] = [];
-
-  products.forEach((product: ProductType) => {
-    checkoutData.push({
-      product_id: product._id,
-      quantity: product.quantity || 1,
-    });
+  products.forEach((product) => {
+    const productId = product._id;
+    const quantity = product.quantity || 1;
+    
+    if (checkoutData[productId]) {
+      checkoutData[productId] += quantity;
+    } else {
+      checkoutData[productId] = quantity;
+    }
   });
-
-  return {items: checkoutData , totalPrice:TotalPrice , deliveryStatus:DeliveryStatus };
+  
+  return { items: checkoutData };
 };
+
 
 export const BASE_URL = "http://localhost:3000"; // BASE URL FOR API FETCHING
 

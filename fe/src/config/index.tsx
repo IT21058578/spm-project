@@ -30,7 +30,7 @@ const RoutePaths = {
     adminSlides : '/admin/slides',
     adminCategories : '/admin/categories',
     adminCustomers: '/admin/customers',
-    adminBlog: '/admin/blog',
+    adminReview: '/admin/reviews',
     adminAccount: '/admin/account',
 
     token: 'token'

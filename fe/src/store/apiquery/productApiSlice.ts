@@ -81,7 +81,17 @@ export const productApiSlice = createApi({
         method: "POST",
         body: formData,
       }),
+      invalidatesTags: ["Products"],
     }),
+
+    getRecommendations: builder.query({
+      query: (getRecommendationsDto) => ({
+        url: 'products/recommendations',
+        method: 'POST',
+        body: getRecommendationsDto,
+      }),
+    }),
+      
   }),
 });
 
@@ -96,4 +106,5 @@ export const {
   useDeleteProductMutation,
   useDownloadProductReportsQuery,
   useUploadImagesMutation,
+  useGetRecommendationsQuery
 } = productApiSlice;

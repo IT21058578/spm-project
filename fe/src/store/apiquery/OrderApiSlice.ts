@@ -50,13 +50,12 @@ export const orderApiSlice = createApi({
             }),
             invalidatesTags : ['Order']
         }),
+       
 
         updateOrderStatus: builder.mutation({
-            query : ({id,formData}) => ({
-                url : `/Orders/${id}`,
-                method : 'PUT',
-                params: formData,
-                
+            query : ({orderID,status}) => ({
+                url : `/Orders/${orderID}?delivery-status=${status}`,
+                method : 'PUT'
             }),
             invalidatesTags : ['Order']
         }),

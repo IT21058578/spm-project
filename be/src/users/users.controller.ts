@@ -24,7 +24,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteReview(@Param('id') id: string) {
     await this.usersService.deleteUser(id);

@@ -16,24 +16,6 @@ const UpdateOrders = ({Orders}: {Orders : Order}) => {
 
   const orderID = Orders._id;
   console.log("After:", orderID);
-  const oID = orderID.toString();
-  
-
-	// const handleSubmit = (e: SyntheticEvent) => {
-
-	// 	e.preventDefault();
-	// 	const form = new FormData(e.target as HTMLFormElement);
-
-	// 	updateOrders({id:orderID,deliveryStatus:form});
-
-	// }
-
-  // const handleUpdateValue = (e: SyntheticEvent) => {
-
-	// 	const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-	// 	setUpdateData(values => ({ ...values, [target.name]: target.value}));
-
-	// }
 
   const [formData, setFormData] = useState({
     deliveryStatus: updateData.deliveryStatus,
@@ -44,16 +26,18 @@ const UpdateOrders = ({Orders}: {Orders : Order}) => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const status = formData.deliveryStatus.toString();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const result = await updateOrders({orderID,formData});
+      const result = await updateOrders({orderID,status});
 
       if ('data' in result && result.data) {
         console.log('Order States Updated successfully');
         toast.success("Order States Updated successfully");
-        setFormData({ deliveryStatus : '' });
+        setFormData({ deliveryStatus:''});
       } else if ('error' in result && result.error) {
         console.error('Order States Update failed', result.error);
         toast.error("Order States Update failed");

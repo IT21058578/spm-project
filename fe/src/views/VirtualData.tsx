@@ -10,6 +10,11 @@ import slider3 from "../assets/img/slider3.jpg";
 import slider4 from "../assets/img/slider4.jpg";
 import slider5 from "../assets/img/slider5.jpg";
 
+import dis from "../assets/img/team/4.jpg";
+import dinuk from "../assets/img/team/3.jpg";
+import sansi from "../assets/img/team/2.jpg";
+import thari from "../assets/img/team/1.jpg";
+
 export type CategoryType = {
   id: string | number;
   name: string;
@@ -339,12 +344,12 @@ export const apiCategory = [
 ];
 
 export const archives = [
-  { archive_id: 1, date: "September 2021" },
-  { archive_id: 2, date: "October 2020" },
-  { archive_id: 3, date: "July 2019" },
-  { archive_id: 4, date: "September 2021" },
-  { archive_id: 5, date: "October 2020" },
-  { archive_id: 6, date: "July 2019" },
+  { archive_id: 1, date: "September 2023" },
+  { archive_id: 2, date: "October 2023" },
+  { archive_id: 3, date: "July 2022" },
+  { archive_id: 4, date: "September 2022" },
+  { archive_id: 5, date: "October 2023" },
+  { archive_id: 6, date: "July 2023" },
 ];
 
 export const tags = [
@@ -361,30 +366,30 @@ export const tags = [
 export const teams = [
   {
     team_id: 1,
-    img: "/img/team/1.jpg",
+    img: dis,
     name: "Disira Thihan",
-    role: "Web Developer",
+    role: "Product Managment System",
   },
   {
     team_id: 2,
-    img: "/img/team/2.jpg",
-    name: "Sansika Kodithuwakku",
-    role: "Designer",
+    img: thari,
+    name: "Thrindu Gunasekara",
+    role: "User Recomendation Algorithm",
   },
   {
     team_id: 3,
-    img: "/img/team/3.jpg",
-    name: "Dinuka Dissanayake",
-    role: "Frontend Developer",
+    img: sansi,
+    name: "Sansika Kodithuwakku",
+    role: "User Managment System",
   },
   {
     team_id: 4,
-    img: "/img/team/4.jpg",
-    name: "Thrindu Gunasekara",
-    role: "Backend Developer",
+    img: dinuk,
+    name: "Dinuka Dissanayake",
+    role: "Order Managment System",
   },
-  // {team_id : 5, img : '/img/team/5.jpg', name: 'Fortunatus KIDJE', role : 'Project Manager'},
-  // {team_id : 6, img : '/img/team/6.jpg', name: 'Fortunatus KIDJE', role : 'DevOps'},
+
+
 ];
 
 export const searchData = [

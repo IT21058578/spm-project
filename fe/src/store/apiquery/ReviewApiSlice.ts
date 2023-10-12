@@ -37,7 +37,25 @@ export const reviewApiSlice = createApi({
 
         downloadReviewsReports: builder.query(({
             query : () => '/reviews/'
-        }))
+        })),
+
+        deleteReview: builder.mutation({
+            query: (reviewId: String) => ({
+              url: `/reviews/${reviewId}`,
+              method: "DELETE",
+            }),
+            invalidatesTags: ["Review"],
+        }),
+
+        updateProduct: builder.mutation({
+            query: ({ reviewID, formData }) => ({
+              url: `/reviews/${reviewID}`,
+              method: "PUT",
+              body: formData,
+            }),
+            invalidatesTags: ["Review"],
+          }),
+
     })
 })
 
@@ -45,4 +63,6 @@ export const reviewApiSlice = createApi({
 export const {
     useGetAllReviewQuery,
     useCreateReviewMutation,
+    useDeleteReviewMutation,
+    useUpdateProductMutation
  } = reviewApiSlice;

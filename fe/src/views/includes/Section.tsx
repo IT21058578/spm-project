@@ -20,6 +20,7 @@ import image1 from "../../assets/img/banner1-2.jpg";
 import image2 from "../../assets/img/banner1-3.jpg";
 import banner1 from "../../assets/img/banner1.jpg";
 import banner2 from "../../assets/img/banner2.jpg";
+import { useGetRecommendationsQuery } from "../../store/apiquery/productApiSlice";
 
 const Category = ({
   category,
@@ -44,11 +45,6 @@ const Category = ({
 };
 
 const AllCategory = () => {
-  // const {
-  //   isLoading,
-  //   data: categoryList,
-  //   isError,
-  // } = useGetAllCategoriesQuery("api/categories");
 
   const isError = false;
 
@@ -57,19 +53,6 @@ const AllCategory = () => {
       <h6 className="fd-bg-primary p-3 fw-bold rounded-top-3">
         ALL CATEGORIES
       </h6>
-      {/* { isError ? (
-          <Spinner />
-      ) : (
-        <div className="category-list d-flex flex-column gap-4 py-2 px-3">
-        {
-          // categoryList['data'].map((category: CategoryType) => <Category category={category} arrow='right' key={category.id} />)
-          apiCategory.map((category: CategoryType) => (
-            <Category category={category} arrow="right" key={category.id} />
-          ))
-        }
-      </div>
-      )} */}
-
       <div className="category-list d-flex flex-column gap-4 py-2 px-3">
         {apiCategory ? ( // Check if apiCategory is defined
           apiCategory.map((category: CategoryType) => (
@@ -252,9 +235,6 @@ const PopularProducts = ({
       <Spinner />
     ) : isSuccess && productsList && productsList.content ? (
       productsList.content.map((product: ProductType) => <ProductCart {...product} type={type} key={product._id} />)
-      // sortProducts.map((product: ProductType) => (
-      //   <ProductCart {...product} type={type} key={product.id} />
-      // ))
     ) : null;
 
   return (
@@ -268,43 +248,6 @@ const PopularProducts = ({
   );
 };
 
-// const PopularProducts = ({
-//   grid = 3,
-//   type = "grid",
-// }: {
-//   grid?: number | boolean;
-//   type?: string;
-// }) => {
-//   const {
-//     isLoading,
-//     data: productsList,
-//     isSuccess,
-//     isError,
-//   } = useGetAllProductsQuery("api/products");
-
-//   let content: React.ReactNode;
-
-//   if (isLoading || isError) {
-//     content = <Spinner />;
-//   } else if (isSuccess && productsList?.data) { // Add a null check here
-//     content = productsList.data.map((product: ProductType) => (
-//       <ProductCart {...product} type={type} key={product._id} />
-//     ));
-//   } else {
-//     content = null;
-//   }
-
-//   return (
-//     <div
-//       className={
-//         type === "list" ? "test" : `d-grid gap-3 grid-0 grid-lg-${grid}`
-//       }
-//     >
-//       {content}
-//     </div>
-//   );
-// };
-
 const SortProducts = () => {
   const { data: products, isLoading, isError } = useGetAllProductsQuery("api/products");
 
@@ -314,9 +257,6 @@ const SortProducts = () => {
         <div>
           {
             products.content.map((product: ProductType ) => <ProductSort {...product} key={product._id} />)
-            // sortProducts.map((product) => (
-            //   <ProductSort key={product.id} {...product} />
-            // ))
           }
         </div>
       ) : (
@@ -325,6 +265,27 @@ const SortProducts = () => {
     </>
   );
 };
+
+
+// Get the recomended data for the use 
+
+// const SortProducts = () => {
+//   const { data: products, isLoading, isError } = useGetRecommendationsQuery("api/products");
+
+//   return (
+//     <>
+//       {!isLoading && !isError && products && products.content? (
+//         <div>
+//           {
+//             products.content.map((product: ProductType ) => <ProductSort {...product} key={product._id} />)
+//           }
+//         </div>
+//       ) : (
+//         <Spinner />
+//       )}
+//     </>
+//   );
+// };
 
 const BlogAndNews = ({ grid = 3 }: { grid?: number }) => {
   return (
@@ -461,21 +422,6 @@ const Section = () => {
           </div>
         </div>
         <MakeCall />
-
-        {/* <div className="blog-news text-black px-3 px-lg-5 my-5">
-          <div className="d-flex flex-wrap justify-content-between mb-5">
-            <h4>Latest Blog & News</h4>
-            <div><a href="#" className="fd-btn fw-bold">View All <i className="bi bi-arrow-right"></i></a></div>
-          </div>
-          <BlogAndNews />
-        </div>
-        <div className="testimonials text-black px-3 px-lg-5 my-5">
-          <div className="d-flex flex-wrap justify-content-between">
-            <h4>Our Awesome Testimonial</h4>
-            <div><a href="#" className="fd-btn fw-bold">View All <i className="bi bi-arrow-right"></i></a></div>
-          </div>
-          <Testimonials />
-        </div> */}
       </div>
     </section>
   );

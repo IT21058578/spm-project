@@ -20,11 +20,12 @@ import ProductMain from "./components/Admin/ProductMain"
 import RoutePaths from "./config"
 import CategoryMain from "./components/Admin/OrdersMain"
 import CustomersMain from "./components/Admin/CustomersMain"
-import BlogMain from "./components/Admin/BlogMain"
+import BlogMain from "./components/Admin/ReviewMain"
 import AdminAccount from "./components/Admin/AdminAccount"
 import SlidesMain from "./components/Admin/SlidesMain"
 import PrivateRoute from "./components/PrivateRoute"
 import RedirectIfAuthenticate from "./components/RedirectIfAuthenticate"
+import ReviewMain from "./components/Admin/ReviewMain"
 
 function App() {
 
@@ -65,7 +66,7 @@ function App() {
         <Route path={RoutePaths.adminProducts} element={<AdminPanel  currentComponent={<ProductMain />} />}></Route>
         <Route path={RoutePaths.adminSlides} element={<AdminPanel  currentComponent={<SlidesMain />} />}></Route>
         <Route path={RoutePaths.adminCategories} element={<AdminPanel  currentComponent={<CategoryMain />} />}></Route>
-        <Route path={RoutePaths.adminBlog} element={<AdminPanel  currentComponent={<BlogMain />} />}></Route>
+        <Route path={RoutePaths.adminReview} element={<AdminPanel  currentComponent={<ReviewMain />} />}></Route>
         <Route path={RoutePaths.adminCustomers} element={<AdminPanel  currentComponent={<CustomersMain />} />}></Route>
         <Route path={RoutePaths.adminAccount} element={<AdminPanel  currentComponent={<AdminAccount />} />}></Route>
       </Route>

@@ -52,6 +52,7 @@ const AdminPanel = ({ currentComponent }: { currentComponent: React.ReactNode })
             <div><Link to={RoutePaths.admin} className={toggleLinkClass(RoutePaths.admin)}>Dashboard<i className="bi bi-house float-end"></i></Link></div>
             <div><Link to={RoutePaths.adminProducts} className={toggleLinkClass(RoutePaths.adminProducts)}>Products<i className="bi bi-newspaper float-end"></i></Link></div>
             <div><Link to={RoutePaths.adminCategories} className={toggleLinkClass(RoutePaths.adminCategories)}>Orders<i className="bi bi-bookmark float-end"></i></Link></div>
+            <div><Link to={RoutePaths.adminReview} className={toggleLinkClass(RoutePaths.adminReview)}>Reviews<i className="bi bi-bookmark float-end"></i></Link></div>
             <div><Link to={RoutePaths.adminCustomers} className={toggleLinkClass(RoutePaths.adminCustomers)}>Customers<i className="bi bi-people float-end"></i></Link></div>
             <div><Link to={RoutePaths.adminAccount} className={toggleLinkClass(RoutePaths.adminAccount)}>Account<i className="bi bi-person float-end"></i></Link></div>
             <div><a href='#' className="d-block p-3 text-black" onClick={logoutUser}>Logout<i className="bi bi-person-slash float-end"></i></a></div>

@@ -19,7 +19,7 @@ import logo from "../../assets/img/logo.png";
 const navsBar = [
   { path: RoutePaths.home, name: "Home" },
   { path: RoutePaths.shop, name: "Shop" },
-  { path: RoutePaths.admin, name: "Admin" },
+  // { path: RoutePaths.admin, name: "Admin" },
   { path: RoutePaths.contact, name: "Contact US" },
   { path: RoutePaths.team, name: "Teams" },
 ];

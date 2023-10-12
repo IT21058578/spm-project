@@ -92,7 +92,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
             onChange={handleUpdateValue}
           />
         </label>
-        <label className="w-50">
+        {/* <label className="w-50">
           <span>Image</span>
           <input
             type="file"
@@ -102,7 +102,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
             placeholder="Change Image"
             onChange={handleUpdateValue}
           />
-        </label>
+        </label> */}
       </div>
       <div className="d-grid grid-4 gap-2 mt-3">
         <label>
@@ -233,7 +233,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
     images: [],
     price: 0,
     color: '',
-    CountInStock: 0,
+    countInStock: 0,
     brand: '',
     type: '',
     tags: [],
@@ -253,7 +253,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
       if ('data' in result && result.data) {
         console.log('Product created successfully');
         toast.success("Product created successfully");
-        setFormData({ name: '',images: [],price: 0,color: '',CountInStock: 0,brand: '',type: '',tags: [] });
+        setFormData({ name: '',images: [],price: 0,color: '',countInStock: 0,brand: '',type: '',tags: [] });
       } else if ('error' in result && result.error) {
         console.error('Product creation failed', result.error);
         toast.error("Product creation failed");
@@ -296,7 +296,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
               onChange={handleValue}
             />
           </label>
-          <label className="w-50">
+          {/* <label className="w-50">
             <span>Image</span>
             <input
               type="file"
@@ -307,7 +307,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
               onChange={handleImageChange}
               accept="image/*"
             />
-          </label>
+          </label> */}
         </div>
         <div className="d-grid grid-4 gap-2 mt-3">
           <label>
@@ -338,8 +338,8 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
             <span>Quantity</span>
             <input
               type="number"
-              name="CountInStock"
-              value={formData.CountInStock}
+              name="countInStock"
+              value={formData.countInStock}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Quantity"
               onChange={handleValue}

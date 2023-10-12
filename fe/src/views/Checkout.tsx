@@ -10,12 +10,16 @@ import LoadingButton from '../components/LoadingButton'
 import { UserType } from '../types'
 import { getItem } from '../Utils/Generals'
 import RoutePaths from '../config'
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from 'react-router-dom';
 
 
 const Checkout = () => {
 
     const isLogged = getItem(RoutePaths.token);
     const user = !isLogged ? null : JSON.parse(getItem("user") || "");
+
+    const navigate = useNavigate();
 
     const createOrderDto = buildCheckoutData();
     const [sendData, result] = useCreateOrderMutation();
@@ -31,6 +35,15 @@ const Checkout = () => {
         sendData(createOrderDto); 
     }
 
+    if (result.isError) {
+        // Handle error response
+        toast.error("An error occurred.");
+      } else if (result.isSuccess) {
+        toast.success("Order plced successfully.");
+        setTimeout(() => {
+            navigate('/login', { replace: true });
+          }, 2000);
+    }
 
     return (
         <>
@@ -40,7 +53,7 @@ const Checkout = () => {
                 <form action="" method="post" className="checkout-service p-3 bg-white col-12 col-lg-8 border border-1">
                     <h4 className='fw-bold'>Billing Details</h4>
                     <hr />
-                    <HandleResult result={result} />
+                    <ToastContainer />
                     <div className='d-flex gap-2 mt-5'>
                         <label className='w-50'>
                             <span>First Name *</span>
