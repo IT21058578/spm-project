@@ -33,7 +33,7 @@ export const orderApiSlice = createApi({
             query : (createOrderDto) => ({
                 url : '/Orders',
                 method : 'POST',
-                body : {createOrderDto},
+                body : createOrderDto,
                 headers: {
                     userId: `Bearer ${user._id}`,
                   },
@@ -55,7 +55,7 @@ export const orderApiSlice = createApi({
             query : ({id,formData}) => ({
                 url : `/Orders/${id}`,
                 method : 'PUT',
-                params: {formData},
+                params: formData,
                 
             }),
             invalidatesTags : ['Order']
