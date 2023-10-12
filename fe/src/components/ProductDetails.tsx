@@ -11,14 +11,15 @@ import { useGetAllReviewQuery } from '../store/apiquery/ReviewApiSlice'
 import { Review } from '../types'
 import { useState } from 'react'
 import ReviewForm from './ReviewForm'
-import { UserType } from '../types'
-import { useAppSelector } from '../hooks/redux-hooks'
+import { getItem } from '../Utils/Generals'
+
+const isLogged = getItem(RoutePaths.token);
+const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const ProductDetails = ({product} : {product : ProductType}) => {
 
   const [activeTab, setActiveTab] = useState('description');
 
-  const user: UserType = useAppSelector(state => state.user);
   const [data, setData] = useState(user);
 
 

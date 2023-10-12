@@ -11,22 +11,24 @@ import { UserType } from '../types'
 import { getItem } from '../Utils/Generals'
 import RoutePaths from '../config'
 
+
 const Checkout = () => {
 
-    const user : UserType = useAppSelector(state => state.user);
+    const isLogged = getItem(RoutePaths.token);
+    const user = !isLogged ? null : JSON.parse(getItem("user") || "");
+
     const data = buildCheckoutData();
     const [sendData, result] = useCreateOrderMutation();
 
     const token = getItem(RoutePaths.token);
 
     const userId = user._id;
-
+    
 
     const submitCheckout = (e : SyntheticEvent) => {
 
         e.preventDefault();
-
-        sendData({userId,token,data}); 
+        sendData({userId,data}); 
     }
 
 

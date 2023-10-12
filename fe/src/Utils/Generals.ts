@@ -48,7 +48,13 @@ type CheckOut = { product_id: string; quantity?: number };
 
 export const buildCheckoutData = () => {
   const products = useAppSelector((state) => state.productCart);
-  const user: UserType = useAppSelector((state) => state.user);
+  const isLogged = getItem(RoutePaths.token);
+  const user = !isLogged ? null : JSON.parse(getItem("user") || "");
+
+  const total = getTotal(); 
+  const TotalPrice =total.toString();
+
+  const DeliveryStatus = "COMPLETED";
 
   let checkoutData: CheckOut[] = [];
 
@@ -59,7 +65,7 @@ export const buildCheckoutData = () => {
     });
   });
 
-  return { user_id: user._id, commands: checkoutData };
+  return { items: checkoutData , totalPrice:TotalPrice , deliveryStatus:DeliveryStatus };
 };
 
 export const BASE_URL = "http://localhost:3000"; // BASE URL FOR API FETCHING

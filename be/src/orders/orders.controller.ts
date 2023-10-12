@@ -51,6 +51,7 @@ export class OrdersController {
 
   @Delete(':id')
   @Roles(UserRole.USER)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteOrders(@Param('id') id: string) {
     await this.ordersService.deleteOrder(id);
@@ -68,6 +69,7 @@ export class OrdersController {
 
   @Post()
   @Roles(UserRole.USER)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   async createOrders(
     @User('_id') userId: string,

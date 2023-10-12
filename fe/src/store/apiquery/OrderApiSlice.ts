@@ -26,11 +26,11 @@ export const orderApiSlice = createApi({
         })),
 
         createOrder: builder.mutation({
-            query : ({ userId,token, data}) => ({
+            query : ({ userId,data,deliveryStatus,totalPrice}) => ({
                 url : '/Orders',
                 method : 'POST',
                 user : userId,
-                body : data,
+                body : {data},
             }),
            invalidatesTags : ['Order']
         }),

@@ -49,6 +49,7 @@ export class ReviewsController {
 
   @Post()
   @Roles(UserRole.USER)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   async createReview(
     @User('_id') userId: string,

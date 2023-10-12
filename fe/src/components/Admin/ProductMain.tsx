@@ -12,6 +12,7 @@ import { HandleResult } from "../HandleResult";
 import { getItem } from "../../Utils/Generals";
 import RoutePaths from "../../config";
 import { useUploadImagesMutation } from "../../store/apiquery/productApiSlice";
+import { ToastContainer, toast } from "react-toastify";
 
 let imageIsChanged = false;
 
@@ -22,28 +23,43 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
   const [updateProduct, udpateResult] = useUpdateProductMutation();
   const imageTag = useRef<HTMLImageElement>(null);
   const productId = product?._id;
-  const token = getItem(RoutePaths.token);
 
-  const handleSubmit = (e: SyntheticEvent) => {
+  const [formData, setFormData] = useState({
+    name: updateData.name,
+    images: updateData.images,
+    price: updateData.price,
+    color: updateData.color,
+    CountInStock: updateData.countInStock,
+    brand: updateData.brand,
+    type: updateData.type,
+    tags: updateData.tags,
+  });
+
+  const handleUpdateValue = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const form = new FormData(e.target as HTMLFormElement);
-    updateProduct({ productId, form, token });
-    imageIsChanged = false;
-  };
 
-  const handleUpdateValue = (e: SyntheticEvent) => {
-    const target = e.target as HTMLInputElement;
+    try {
+      const result = await updateProduct({productId,formData});
 
-    if (target.name === "img" && imageTag.current && target.files) {
-      imageIsChanged = true;
-      imageTag.current.src = URL.createObjectURL(target.files[0]);
+      if ('data' in result && result.data) {
+        console.log('Product Updated successfully');
+        toast.success("Product Updated successfully");
+        setFormData({ name: '',images: [],price: 0,color: '',CountInStock: 0,brand: '',type: '',tags: [] });
+      } else if ('error' in result && result.error) {
+        console.error('Product creation failed', result.error);
+        toast.error("Product creation failed");
+      }
+    } catch (error) {
+      console.error('Product creation failed`', error);
+      toast.error("Product creation failed");
     }
-    setUpdateData((prevState) => ({
-      ...prevState,
-      [target.name]: target.value,
-    }));
   };
-  // udpateResult.isError ? console.log(JSON.stringify(udpateResult.error)) : udpateResult;
+  
 
   return (
     <form
@@ -72,7 +88,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
             type="text"
             name="name"
             className="form-control w-100 rounded-0 p-2"
-            value={updateData.name}
+            value={formData.name}
             onChange={handleUpdateValue}
           />
         </label>
@@ -81,6 +97,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
           <input
             type="file"
             name="images"
+            value={formData.images}
             className="form-control w-100 rounded-0 p-2"
             placeholder="Change Image"
             onChange={handleUpdateValue}
@@ -94,7 +111,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
             type="number"
             name="price"
             className="form-control w-100 rounded-0 p-2"
-            value={updateData.price}
+            value={formData.price}
             onChange={handleUpdateValue}
           />
         </label>
@@ -104,7 +121,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
             type="text"
             name="color"
             className="form-control w-100 rounded-0 p-2"
-            value={updateData.color}
+            value={formData.color}
             onChange={handleUpdateValue}
           />
         </label>
@@ -114,7 +131,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
             type="text"
             name="CountInStock"
             className="form-control w-100 rounded-0 p-2"
-            value={updateData.countInStock}
+            value={formData.CountInStock}
             onChange={handleUpdateValue}
           />
         </label>
@@ -124,11 +141,23 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
             type="text"
             name="brand"
             className="form-control w-100 rounded-0 p-2"
-            value={updateData.brand}
+            value={formData.brand}
             onChange={handleUpdateValue}
           />
         </label>
       </div>
+      <label>
+            <span>Description</span>
+            <textarea
+              name="type"
+              cols={100}
+              rows={10}
+              value={formData.type}
+              className="w-100 p-2 border"
+              placeholder="Description"
+              onChange={handleUpdateValue}
+            ></textarea>
+      </label>
       <div className="my-4">
         <label>
           <span>Tags</span>
@@ -139,12 +168,12 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
           rows={10}
           className="w-100 p-2 border"
           placeholder="tags"
-          value={updateData.tags}
+          value={formData.tags}
           onChange={handleUpdateValue}
         ></textarea>
       </div>
       <div className="mt-4">
-        <HandleResult result={udpateResult} />
+        <ToastContainer/>
       </div>
       <div className="mt-3">
         {udpateResult.isLoading ? (
@@ -167,7 +196,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
 };
 
 const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
-  const [data, setData] = useState({});
+  // const [data, setData] = useState({});
 
   // const { data : categories } = useGetAllCategoriesQuery('api/categories')
 
@@ -199,16 +228,40 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
     }
   };
 
-  const handleSubmit = (e: SyntheticEvent) => {
-    e.preventDefault();
+  const [formData, setFormData] = useState({
+    name: '',
+    images: [],
+    price: 0,
+    color: '',
+    CountInStock: 0,
+    brand: '',
+    type: '',
+    tags: [],
+  });
 
-    const form = new FormData(e.target as HTMLFormElement);
-    createProduct(form);
+  const handleValue = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleValue = (e: SyntheticEvent) => {
-    const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-    setData((values) => ({ ...values, [target.name]: target.value }));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const result = await createProduct({formData});
+
+      if ('data' in result && result.data) {
+        console.log('Product created successfully');
+        toast.success("Product created successfully");
+        setFormData({ name: '',images: [],price: 0,color: '',CountInStock: 0,brand: '',type: '',tags: [] });
+      } else if ('error' in result && result.error) {
+        console.error('Product creation failed', result.error);
+        toast.error("Product creation failed");
+      }
+    } catch (error) {
+      console.error('Product creation failed`', error);
+      toast.error("Product creation failed");
+    }
   };
 
   if (!product) {
@@ -237,6 +290,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
             <input
               type="text"
               name="name"
+              value={formData.name}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Product Name"
               onChange={handleValue}
@@ -247,6 +301,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
             <input
               type="file"
               name="image"
+              value={formData.images}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Product Image"
               onChange={handleImageChange}
@@ -261,6 +316,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
               type="number"
               step={0.1}
               name="price"
+              value={formData.price}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Product Price"
               onChange={handleValue}
@@ -272,6 +328,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
               type="string"
               step={0.1}
               name="color"
+              value={formData.color}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Color"
               onChange={handleValue}
@@ -282,6 +339,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
             <input
               type="number"
               name="CountInStock"
+              value={formData.CountInStock}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Quantity"
               onChange={handleValue}
@@ -292,10 +350,23 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
             <input
               type="text"
               name="brand"
+              value={formData.brand}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Brand"
               onChange={handleValue}
             />
+          </label>
+          <label>
+            <span>Description</span>
+            <textarea
+              name="type"
+              cols={100}
+              rows={10}
+              value={formData.type}
+              className="w-100 p-2 border"
+              placeholder="Description"
+              onChange={handleValue}
+            ></textarea>
           </label>
         </div>
         <div className="my-4">
@@ -306,13 +377,14 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
             name="tags"
             cols={100}
             rows={10}
+            value={formData.tags}
             className="w-100 p-2 border"
             placeholder="Tags"
             onChange={handleValue}
           ></textarea>
         </div>
         <div className="mt-3">
-          <HandleResult result={result} />
+          <ToastContainer />
         </div>
         <div className="mt-3">
           {result.isLoading ? (
@@ -338,6 +410,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
   }
 
   return <UpdateProduct product={product} />;
+
 };
 
 const ListOfProducts = ({
@@ -383,6 +456,7 @@ const ListOfProducts = ({
       ? null
       : isSuccess
       ? productsList.content.map((product: ProductType) => {
+       const  productId = product._id;
           // ? sortProducts.map((product: ProductType) => {
 
           return (
@@ -421,7 +495,7 @@ const ListOfProducts = ({
                   title="Delete"
                   onClick={(e) => {
                     e.preventDefault();
-                    deleteItem(product._id);
+                    deleteItem(productId);
                   }}
                 >
                   <i className="bi bi-trash"></i>

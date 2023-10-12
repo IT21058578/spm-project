@@ -16,6 +16,10 @@ import { Order } from '../types'
 import { useDeleteOrderMutation } from '../store/apiquery/OrderApiSlice'
 import { logoutCurrentUser } from '../store/userSlice'
 import { UserType } from '../types'
+import { getItem } from '../Utils/Generals'
+
+const isLogged = getItem(RoutePaths.token);
+const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 export const UserDashboard = () => {
     return (
@@ -28,9 +32,11 @@ export const UserDashboard = () => {
 
 export const UserOrders = () => {
 
-    const user: UserType = useAppSelector(state => state.user);
     // let content: React.ReactHTMLElement<HTMLElement> = <></>;
     const { data:reviews, isLoading, isError ,isSuccess } = useGetAllOrderQuery("api/orders");
+    const [data, setData] = useState(user);
+
+    const filteredOrders = reviews?.content.filter((review:Order ) => review.userId === data._id) || [];
 
     const [deleteOrder, deletedResult] = useDeleteOrderMutation();
 
@@ -65,7 +71,7 @@ export const UserOrders = () => {
 		? null
 		: isSuccess
 			// ? ordersList['data'].map((order: orderType) => {
-			? reviews.content.map((order: Order) => {
+			? filteredOrders.map((order: Order) => {
 
 				return (
 					<tr className="p-3" key={order._id}>
@@ -138,15 +144,14 @@ export const UserOrders = () => {
 }
 
 export const UserAddress = () => {
-
-    const user: UserType = useAppSelector(state => state.user);
+    const [data, setData] = useState(user);
 
     return (
         <div className="user-address p-3 border border-2 text-black">
             <h3>Billing Address</h3>
             <div className="opacity-75">
-                <h6>{user.region} , {user.country}</h6>
-                <h6><span className="fw-bold">Email:</span> {user.email} </h6>
+                <h6>{data.region} , {data.country}</h6>
+                <h6><span className="fw-bold">Email:</span> {data.email} </h6>
             </div>
         </div>
     )
@@ -154,7 +159,6 @@ export const UserAddress = () => {
 
 export const UserDetails = () => {
 
-    const user: UserType = useAppSelector(state => state.user);
     const [data, setData] = useState(user);
     const [updateUser, result] = useUpdateUserMutation();
 

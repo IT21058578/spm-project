@@ -45,10 +45,10 @@ export const productApiSlice = createApi({
     }),
 
     createProduct: builder.mutation({
-      query: ({ product }) => ({
+      query: ({ formData }) => ({
         url: "/products",
         method: "POST",
-        body: product,
+        body: formData,
       }),
       invalidatesTags: ["Products"],
     }),

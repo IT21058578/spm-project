@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { UserType } from "../../types";
 import { useAppSelector } from "../../hooks/redux-hooks";
+import RoutePaths from "../../config";
+import { getItem } from "../../Utils/Generals";
+
+
+const isLogged = getItem(RoutePaths.token);
+const user = !isLogged ? null : JSON.parse(getItem("user") || "");
 
 const AddAccount = () => {
   return (
@@ -219,8 +225,7 @@ const AdminAccount = () => {
     setPage("list");
   };
 
-  const user: UserType = useAppSelector((state) => state.user);
-  console.log(user?._id);
+
   const [data, setData] = useState(user);
 
   return (

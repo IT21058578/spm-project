@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { removeItem, toggleLinkClass } from '../../Utils/Generals'
 import RoutePaths from '../../config'
 import Swal from 'sweetalert2'
+import { useAppDispatch } from '../../hooks/redux-hooks'
+import { logoutCurrentUser } from '../../store/userSlice'
 
 
 const AdminPanel = ({ currentComponent }: { currentComponent: React.ReactNode }) => {
@@ -19,6 +21,7 @@ const AdminPanel = ({ currentComponent }: { currentComponent: React.ReactNode })
   }, [])
 
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
 
   const logoutUser = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -34,7 +37,7 @@ const AdminPanel = ({ currentComponent }: { currentComponent: React.ReactNode })
       if (r.isConfirmed) {
         removeItem(RoutePaths.token);
         removeItem('user');
-        // dispatch(logoutCurrentUser)
+        dispatch(logoutCurrentUser)
         navigate(RoutePaths.home)
       }
     })
