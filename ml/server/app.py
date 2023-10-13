@@ -79,7 +79,7 @@ def getRecommendations():
 
     # Calculating scores
     allProducts = pd.DataFrame(products_coll.find()).set_index('_id').drop(
-        ['type', 'brand', 'price', 'createdAt', 'images'], axis='columns')
+        ['type', 'brand', 'price', 'images'], axis='columns')
     allProducts = allProducts.drop(excludedProductIds)
     # Drop all products that are unavailable or bought
     allProducts: pd.DataFrame = allProducts.loc[allProducts['countInStock'].values != 0]

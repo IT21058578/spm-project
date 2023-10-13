@@ -7,15 +7,10 @@ import Blog from "../../components/Blog";
 import Testimonial from "../../components/Testimonial";
 import { CategoryType, blogInfo, testimonialInfo } from "../VirtualData";
 import { Link } from "react-router-dom";
-import { useAppSelector } from "../../hooks/redux-hooks";
-import {
-  useGetAllProductsQuery,
-  useGetBestProductsQuery,
-} from "../../store/apiquery/productApiSlice";
+import { useGetAllProductsQuery } from "../../store/apiquery/productApiSlice";
 import Spinner from "../../components/Spinner";
-import { useGetAllCategoriesQuery } from "../../store/apiquery/categoryApiSlice";
 import RoutePaths from "../../config";
-import { apiCategory, sortProducts } from "../VirtualData";
+import { apiCategory } from "../VirtualData";
 import image1 from "../../assets/img/banner1-2.jpg";
 import image2 from "../../assets/img/banner1-3.jpg";
 import banner1 from "../../assets/img/banner1.jpg";
@@ -45,7 +40,6 @@ const Category = ({
 };
 
 const AllCategory = () => {
-
   const isError = false;
 
   return (
@@ -234,7 +228,9 @@ const PopularProducts = ({
     isLoading || isError ? (
       <Spinner />
     ) : isSuccess && productsList && productsList.content ? (
-      productsList.content.map((product: ProductType) => <ProductCart {...product} type={type} key={product._id} />)
+      productsList.content.map((product: ProductType) => (
+        <ProductCart {...product} type={type} key={product._id} />
+      ))
     ) : null;
 
   return (
@@ -248,37 +244,20 @@ const PopularProducts = ({
   );
 };
 
-const SortProducts = () => {
-  const { data: products, isLoading, isError } = useGetAllProductsQuery("api/products");
-
-  return (
-    <>
-      {!isLoading && !isError && products && products.content? (
-        <div>
-          {
-            products.content.map((product: ProductType ) => <ProductSort {...product} key={product._id} />)
-          }
-        </div>
-      ) : (
-        <Spinner />
-      )}
-    </>
-  );
-};
-
-
-// Get the recomended data for the use 
-
 // const SortProducts = () => {
-//   const { data: products, isLoading, isError } = useGetRecommendationsQuery("api/products");
+//   const {
+//     data: products,
+//     isLoading,
+//     isError,
+//   } = useGetAllProductsQuery("api/products");
 
 //   return (
 //     <>
-//       {!isLoading && !isError && products && products.content? (
+//       {!isLoading && !isError && products && products.content ? (
 //         <div>
-//           {
-//             products.content.map((product: ProductType ) => <ProductSort {...product} key={product._id} />)
-//           }
+//           {products.content.map((product: ProductType) => (
+//             <ProductSort {...product} key={product._id} />
+//           ))}
 //         </div>
 //       ) : (
 //         <Spinner />
@@ -286,6 +265,30 @@ const SortProducts = () => {
 //     </>
 //   );
 // };
+
+// Get the recomended data for the use
+
+const SortProducts = () => {
+  const {
+    data: products,
+    isLoading,
+    isError,
+  } = useGetRecommendationsQuery("api/products");
+
+  return (
+    <>
+      {!isLoading && !isError && products && products.content ? (
+        <div>
+          {products.content.map((product: ProductType) => (
+            <ProductSort {...product} key={product._id} />
+          ))}
+        </div>
+      ) : (
+        <Spinner />
+      )}
+    </>
+  );
+};
 
 const BlogAndNews = ({ grid = 3 }: { grid?: number }) => {
   return (

@@ -1,4 +1,4 @@
-import React, { useState, SyntheticEvent, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ProductType } from "../ProductCart";
 import {
   useCreateProductMutation,
@@ -8,9 +8,6 @@ import {
 } from "../../store/apiquery/productApiSlice";
 import Swal from "sweetalert2";
 import Spinner from "../Spinner";
-import { HandleResult } from "../HandleResult";
-import { getItem } from "../../Utils/Generals";
-import RoutePaths from "../../config";
 import { useUploadImagesMutation } from "../../store/apiquery/productApiSlice";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -29,13 +26,17 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
     images: updateData.images,
     price: updateData.price,
     color: updateData.color,
-    CountInStock: updateData.countInStock,
+    countInStock: updateData.countInStock,
     brand: updateData.brand,
     type: updateData.type,
     tags: updateData.tags,
   });
 
-  const handleUpdateValue = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleUpdateValue = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -44,22 +45,30 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
     e.preventDefault();
 
     try {
-      const result = await updateProduct({productId,formData});
+      const result = await updateProduct({ productId, formData });
 
-      if ('data' in result && result.data) {
-        console.log('Product Updated successfully');
+      if ("data" in result && result.data) {
+        console.log("Product Updated successfully");
         toast.success("Product Updated successfully");
-        setFormData({ name: '',images: [],price: 0,color: '',CountInStock: 0,brand: '',type: '',tags: [] });
-      } else if ('error' in result && result.error) {
-        console.error('Product creation failed', result.error);
+        setFormData({
+          name: "",
+          images: [],
+          price: 0,
+          color: "",
+          countInStock: 0,
+          brand: "",
+          type: "",
+          tags: [],
+        });
+      } else if ("error" in result && result.error) {
+        console.error("Product creation failed", result.error);
         toast.error("Product creation failed");
       }
     } catch (error) {
-      console.error('Product creation failed`', error);
+      console.error("Product creation failed`", error);
       toast.error("Product creation failed");
     }
   };
-  
 
   return (
     <form
@@ -129,9 +138,9 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
           <span>Quantity</span>
           <input
             type="text"
-            name="CountInStock"
+            name="countInStock"
             className="form-control w-100 rounded-0 p-2"
-            value={formData.CountInStock}
+            value={formData.countInStock}
             onChange={handleUpdateValue}
           />
         </label>
@@ -147,16 +156,16 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
         </label>
       </div>
       <label>
-            <span>Description</span>
-            <textarea
-              name="type"
-              cols={100}
-              rows={10}
-              value={formData.type}
-              className="w-100 p-2 border"
-              placeholder="Description"
-              onChange={handleUpdateValue}
-            ></textarea>
+        <span>Description</span>
+        <textarea
+          name="type"
+          cols={100}
+          rows={10}
+          value={formData.type}
+          className="w-100 p-2 border"
+          placeholder="Description"
+          onChange={handleUpdateValue}
+        ></textarea>
       </label>
       <div className="my-4">
         <label>
@@ -173,7 +182,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
         ></textarea>
       </div>
       <div className="mt-4">
-        <ToastContainer/>
+        <ToastContainer />
       </div>
       <div className="mt-3">
         {udpateResult.isLoading ? (
@@ -229,17 +238,21 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
   };
 
   const [formData, setFormData] = useState({
-    name: '',
+    name: "",
     images: [],
     price: 0,
-    color: '',
+    color: "",
     countInStock: 0,
-    brand: '',
-    type: '',
+    brand: "",
+    type: "",
     tags: [],
   });
 
-  const handleValue = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleValue = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -248,18 +261,27 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
     e.preventDefault();
 
     try {
-      const result = await createProduct({formData});
+      const result = await createProduct({ formData });
 
-      if ('data' in result && result.data) {
-        console.log('Product created successfully');
+      if ("data" in result && result.data) {
+        console.log("Product created successfully");
         toast.success("Product created successfully");
-        setFormData({ name: '',images: [],price: 0,color: '',countInStock: 0,brand: '',type: '',tags: [] });
-      } else if ('error' in result && result.error) {
-        console.error('Product creation failed', result.error);
+        setFormData({
+          name: "",
+          images: [],
+          price: 0,
+          color: "",
+          countInStock: 0,
+          brand: "",
+          type: "",
+          tags: [],
+        });
+      } else if ("error" in result && result.error) {
+        console.error("Product creation failed", result.error);
         toast.error("Product creation failed");
       }
     } catch (error) {
-      console.error('Product creation failed`', error);
+      console.error("Product creation failed`", error);
       toast.error("Product creation failed");
     }
   };
@@ -410,10 +432,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
   }
 
   return <UpdateProduct product={product} />;
-
 };
-
-
 
 const ListOfProducts = ({
   setProduct,
@@ -435,7 +454,7 @@ const ListOfProducts = ({
     setPage("add");
   };
 
-  const deleteItem = (id: string ) => {
+  const deleteItem = (id: string) => {
     Swal.fire({
       title: "Are you sure?",
       text: "Are you sure to delete this product ?",
@@ -458,7 +477,6 @@ const ListOfProducts = ({
       ? null
       : isSuccess
       ? productsList.content.map((product: ProductType) => {
-
           // ? sortProducts.map((product: ProductType) => {
 
           return (

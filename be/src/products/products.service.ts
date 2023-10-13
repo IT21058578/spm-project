@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
@@ -140,16 +141,22 @@ export class ProductsService {
     getRecommendationsDto: GetRecommendationsDto,
   ): Promise<Page<ProductDocument>> {
     this.logger.log(`Getting recommended products...`);
-    const recommendedProductsIds = (
-      await firstValueFrom(
-        this.httpService.post<ProductDocument[]>(
-          `${this.configService.get(
-            ConfigKey.FLASK_URL,
-          )}/products/recommendations`,
-          getRecommendationsDto,
-        ),
-      )
-    ).data;
+    let recommendedProductsIds: string[] = [];
+    try {
+      recommendedProductsIds = (
+        await firstValueFrom(
+          this.httpService.post<string[]>(
+            `${this.configService.get(
+              ConfigKey.FLASK_URL,
+            )}/products/recommendations`,
+            getRecommendationsDto,
+          ),
+        )
+      ).data;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
 
     const products = await this.productModel.find({
       _id: recommendedProductsIds,
