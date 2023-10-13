@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState}from 'react'
 import Swal from 'sweetalert2';
 import { useDeleteUserMutation, useGetAllUsersQuery } from '../../store/apiquery/usersApiSlice';
 import Spinner from '../Spinner';
@@ -28,12 +28,33 @@ const ListOfCustomers = () => {
     });
   }
 
+  // search bar coding 
+  const [searchInput, setSearchInput] = useState<string>('');
+
   let content: React.ReactNode;
+
+    // Filter customers based on the search input
+  const filteredCustomers = customersList?.content.filter((user: UserType) =>{
+    const firstname = user.firstName?.toLowerCase();
+    const lastname = user.lastName?.toLowerCase();
+    const email = user.email?.toLowerCase();
+    const region = user.region?.toLowerCase();
+    const country = user.country?.toLowerCase();
+    const search = searchInput.toLowerCase();
+
+    return (
+      firstname?.includes(search) ||
+      lastname?.includes(search) ||
+      email?.includes(search) ||
+      region?.includes(search) ||
+      country?.includes(search)
+    );
+  });
 
   content = isLoading || isError
     ? null
     : isSuccess && customersList && customersList.content
-      ? customersList.content.map((customer: UserType) => {
+      ? filteredCustomers.map((customer: UserType) => {
         const customerId = customer._id || '';
 
         return (
@@ -56,8 +77,17 @@ const ListOfCustomers = () => {
       : null;
 
 
-  return (
-    !isLoading ?
+  return ( !isLoading ?
+    <div>
+      {/* Add a search input field */}
+      <div className="mb-3">
+      <input
+        type="text"
+        placeholder="Search Review"
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+      />
+    </div>
       <div className="table-responsive">
         <table className="table table-default text-center table-bordered">
           <thead>
@@ -75,6 +105,7 @@ const ListOfCustomers = () => {
             {content}
           </tbody>
         </table>
+        </div>
       </div> :
       <Spinner />
   )

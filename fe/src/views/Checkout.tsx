@@ -29,22 +29,30 @@ const Checkout = () => {
     const userId = user._id;
     
 
-    const submitCheckout = (e : SyntheticEvent) => {
-
+    const submitCheckout = async (e: SyntheticEvent) => {
         e.preventDefault();
-        sendData(createOrderDto); 
-    }
-
-    if (result.isError) {
-        // Handle error response
-        toast.error("An error occurred.");
-      } else if (result.isSuccess) {
-        toast.success("Order plced successfully.");
-        setTimeout(() => {
-            navigate('/login', { replace: true });
-          }, 2000);
-    }
-
+      
+        try {
+          const result = await sendData(createOrderDto);
+      
+          if ('error' in result) {
+            // Handle error response
+            const errorMessage = 'An error occurred.';
+            toast.error(errorMessage);
+          } else {
+            // Handle success response
+            toast.success("Order placed successfully.");
+            setTimeout(() => {
+              navigate('/myaccount/orders', { replace: true });
+            }, 2000);
+          }
+        } catch (error) {
+          // Handle any other uncaught errors here
+          console.error("An unexpected error occurred:", error);
+          toast.error("An unexpected error occurred.");
+        }
+      };
+      
     return (
         <>
             <Header />

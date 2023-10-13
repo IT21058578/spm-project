@@ -470,13 +470,32 @@ const ListOfProducts = ({
     });
   };
 
+  // search bar coding 
+  const [searchInput, setSearchInput] = useState<string>('');
+
   let content: React.ReactNode;
+
+  // Filter products based on the search input
+    const filteredProducts = productsList?.content.filter((product: ProductType) =>{
+      const productname = product.name?.toLowerCase();
+      const search = searchInput.toLowerCase();
+    
+      // Convert numbers to strings before searching
+      const price = product.price?.toString();
+      const totalstock = product.countInStock?.toString();
+  
+      return (
+        productname?.includes(search) ||
+        price?.includes(search) ||
+        totalstock?.includes(search)
+      );
+    });
 
   content =
     isLoading || isError
       ? null
       : isSuccess
-      ? productsList.content.map((product: ProductType) => {
+      ? filteredProducts.map((product: ProductType) => {
           // ? sortProducts.map((product: ProductType) => {
 
           return (
@@ -527,6 +546,16 @@ const ListOfProducts = ({
       : null;
 
   return !isLoading ? (
+    <div>
+      {/* Add a search input field */}
+      <div className="mb-3">
+      <input
+        type="text"
+        placeholder="Search Products"
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+      />
+    </div>
     <div className="table-responsive">
       <table className="table table-default text-center table-bordered">
         <thead>
@@ -550,6 +579,7 @@ const ListOfProducts = ({
         </thead>
         <tbody>{content}</tbody>
       </table>
+    </div>
     </div>
   ) : (
     <Spinner />

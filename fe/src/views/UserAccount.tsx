@@ -33,12 +33,17 @@ export const UserDashboard = () => {
 export const UserOrders = () => {
 
     // let content: React.ReactHTMLElement<HTMLElement> = <></>;
-    const { data:reviews, isLoading, isError ,isSuccess } = useGetAllOrderQuery("api/orders");
+    const { data:orders, isLoading, isError ,isSuccess } = useGetAllOrderQuery("api/orders");
     const [data, setData] = useState(user);
 
-    console.log(data._id)
+    // Filter reviews for the specific product
+    const filteredOrders = orders?.content.filter((order: Order) => {order.createdBy === data._id
+        console.log(order._id);
+    }) || [];
 
-    const filteredOrders = reviews?.content.filter((review:Order ) => review.userId === data._id) || [];
+
+      
+    console.log('Filtered Orders:', filteredOrders);
 
     const [deleteOrder, deletedResult] = useDeleteOrderMutation();
 
@@ -73,7 +78,7 @@ export const UserOrders = () => {
 		? null
 		: isSuccess
 			// ? ordersList['data'].map((order: orderType) => {
-			? filteredOrders.map((order: Order) => {
+			? orders?.content.map((order: Order) => {
 
 				return (
 					<tr className="p-3" key={order._id}>
@@ -94,7 +99,7 @@ export const UserOrders = () => {
                             </span>
                         </td>
                         <td className='fw-bold d-flex gap-2 justify-content-center'>
-                        {order?.deliveryStatus === 'COMPLETED' && (
+                        {order?.deliveryStatus === 'PENDING' && (
                             <a
                             href="#"
                             className='p-2 rounded-2 bg-danger'
@@ -178,46 +183,6 @@ export const UserDetails = () => {
 
 
     return (
-        // <div className="user-edit-details p-3 border border-2 text-black">
-        //     <h3>Account Details</h3>
-        //     <form action="" method="post" className="checkout-service p-3" onSubmit={handleSubmit}>
-        //         <div className='d-flex gap-2'>
-        //             <label className='w-50'>
-        //                 <span>First Name</span>
-        //                 <input type="text" name="firstname" className="form-control w-100 rounded-0 p-2" value={data.firstName} onChange={handleChange} />
-        //             </label>
-        //             <label className='w-50'>
-        //                 <span>Last Name</span>
-        //                 <input type="text" name="lastname" className="form-control w-100 rounded-0 p-2" value={data.lastName} onChange={handleChange} />
-        //             </label>
-        //         </div>
-        //         <div className='my-4'>
-        //             <label className='w-100'>
-        //                 <span>Email</span>
-        //                 <input type="email" name="email" className="form-control w-100 rounded-0 p-2" value={data.email} onChange={handleChange} />
-        //             </label>
-        //         </div>
-        //         <div>
-        //             <label className='w-100'>
-        //                 <span>Country</span>
-        //                 <input type="text" name="country" className="form-control w-100 rounded-0 p-2" value={data.country} onChange={handleChange} />
-        //             </label>
-        //         </div>
-        //         <div className='my-4'>
-        //             <label className='w-100'>
-        //                 <span>Region</span>
-        //                 <input type="text" name="region" className="form-control w-100 rounded-0 p-2" value={user.region} onChange={handleChange} />
-        //             </label>
-        //         </div>
-        //         <div className='my-4'>
-        //             <HandleResult result={result} />
-        //         </div>
-        //         <LoadingButton loadingState={result.isLoading}>
-        //             <div className='mt-4'><button type="submit" className="fd-btn border-0 w-100 text-center">SAVE NOW</button></div>
-        //         </LoadingButton>
-
-        //     </form>
-        // </div>
 
     <div className="container">
          <div className="card border-0 shadow-lg">

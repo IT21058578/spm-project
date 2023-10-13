@@ -8,6 +8,7 @@ export interface Review {
 export interface Order {
     _id: string;
     userId: string;
+    createdBy: string;
     items: {
       [productId: string]: {
         price: number;

@@ -98,13 +98,21 @@ const ListOfOrders = ({ setOrders, setPage }: { setOrders: Function, setPage: Fu
     });
   }
 
+  // search bar coding 
+  const [searchInput, setSearchInput] = useState<string>('');
+
   let content: React.ReactNode;
   let count = 0;
+
+  // Filter products based on the search input
+  const filteredOrders = OrdersList?.content.filter((order: Order) =>
+    order.deliveryStatus.toLowerCase().includes(searchInput.toLowerCase())
+  );
 
   content = isLoading || isError
     ? null
     : isSuccess
-      ? OrdersList.content.map((Orders: Order) => {
+      ? filteredOrders.map((Orders: Order) => {
 
         return (
           <tr className="p-3" key={Orders._id}>
@@ -133,8 +141,19 @@ const ListOfOrders = ({ setOrders, setPage }: { setOrders: Function, setPage: Fu
       })
       : null;
 
-  return (
-    !isLoading ? <div className="table-responsive">
+  return !isLoading ? (
+      <div>
+     {/* Add a search input field */}
+     <div className="mb-3">
+      <input
+        type="text"
+        placeholder="Search Orders"
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+      />
+    </div>
+
+    <div className="table-responsive">
       <table className="table table-default text-center table-bordered">
         <thead>
           <tr className='fd-bg-primary text-white'>
@@ -151,7 +170,8 @@ const ListOfOrders = ({ setOrders, setPage }: { setOrders: Function, setPage: Fu
           }
         </tbody>
       </table>
-    </div> : <Spinner />
+      </div>
+    </div>) : (<Spinner />
   );
 }
 

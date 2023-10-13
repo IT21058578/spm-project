@@ -102,13 +102,30 @@ const ListofReviews = ({ setReviews, setPage }: { setReviews: Function, setPage:
     });
   }
 
+  // search bar coding 
+  const [searchInput, setSearchInput] = useState<string>('');
+
   let content: React.ReactNode;
   let count = 0;
+
+    // Filter reviews based on the search input
+  const filteredReviews = ReviewsList?.content.filter((review: Review) =>{
+    const reviewDescription = review.description?.toLowerCase();
+    const search = searchInput.toLowerCase();
+  
+    // Convert numbers to strings before searching
+    const rating = review.rating?.toString();
+
+    return (
+      reviewDescription?.includes(search) ||
+      rating?.includes(search) 
+    );
+  });
 
   content = isLoading || isError
     ? null
     : isSuccess
-      ? ReviewsList.content.map((Reviews: Review) => {
+      ? filteredReviews.map((Reviews: Review) => {
 
         return (
           <tr className="p-3" key={Reviews._id}>
@@ -125,8 +142,18 @@ const ListofReviews = ({ setReviews, setPage }: { setReviews: Function, setPage:
       })
       : null;
 
-  return (
-    !isLoading ? <div className="table-responsive">
+  return ( !isLoading ? 
+  <div>
+    {/* Add a search input field */}
+    <div className="mb-3">
+    <input
+      type="text"
+      placeholder="Search Review"
+      value={searchInput}
+      onChange={(e) => setSearchInput(e.target.value)}
+    />
+  </div>
+  <div className="table-responsive">
       <table className="table table-default text-center table-bordered">
         <thead>
           <tr className='fd-bg-primary text-white'>
@@ -143,6 +170,7 @@ const ListofReviews = ({ setReviews, setPage }: { setReviews: Function, setPage:
           }
         </tbody>
       </table>
+    </div>
     </div> : <Spinner />
   );
 }
