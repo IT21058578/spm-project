@@ -172,7 +172,7 @@ const UpdateProduct = ({ product }: { product: ProductType }) => {
           <span>Tags</span>
         </label>
         <textarea
-          name="Tags"
+          name="tags"
           cols={100}
           rows={10}
           className="w-100 p-2 border"
@@ -210,30 +210,43 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
   // const { data : categories } = useGetAllCategoriesQuery('api/categories')
 
   const [createProduct, result] = useCreateProductMutation();
-  const [uploadImages] = useUploadImagesMutation(); // Destructure the mutation function
+  // const [uploadImages] = useUploadImagesMutation(); // Destructure the mutation function
   const [image, setImage] = useState<File | null>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
+  // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files && e.target.files[0]) {
+  //     setImage(e.target.files[0]);
+  //   }
+  // };
+
+  // const handleImageUpload = async () => {
+  //   if (image) {
+  //     const formData = new FormData();
+  //     formData.append("file", image);
+
+  //     try {
+  //       const result = await uploadImages(formData);
+  //       if ("data" in result && result.data) {
+  //         console.log("Image uploaded successfully");
+  //       } else if ("error" in result && result.error) {
+  //         console.error("Image upload failed", result.error);
+  //       }
+  //     } catch (error) {
+  //       console.error("Image upload failed", error);
+  //     }
+  //   }
+  // };
+
+  const [file, setFile] = React.useState(null);
+  const [uploadFile, { isLoading }] = useUploadImagesMutation();
+
+  const handleFileChange = (e:any) => {
+    setFile(e.target.files[0]);
   };
 
-  const handleImageUpload = async () => {
-    if (image) {
-      const formData = new FormData();
-      formData.append("file", image);
-
-      try {
-        const result = await uploadImages(formData);
-        if ("data" in result && result.data) {
-          console.log("Image uploaded successfully");
-        } else if ("error" in result && result.error) {
-          console.error("Image upload failed", result.error);
-        }
-      } catch (error) {
-        console.error("Image upload failed", error);
-      }
+  const handleUpload = () => {
+    if (file) {
+      uploadFile(file);
     }
   };
 
@@ -259,6 +272,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // handleUpload(); 
 
     try {
       const result = await createProduct({ formData });
@@ -323,10 +337,10 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
             <input
               type="file"
               name="images"
-              value={formData.images}
+              // value={formData.images}
               className="form-control w-100 rounded-0 p-2"
               placeholder="Product Image"
-              onChange={handleImageChange}
+              onChange={handleFileChange}
               accept="image/*"
             />
           </label> */}
@@ -421,7 +435,7 @@ const AddOrEditProduct = ({ product }: { product: null | ProductType }) => {
           ) : (
             <button
               className="fd-btn w-25 text-center border-0"
-              onClick={handleImageUpload}
+              // onClick={handleUpload}
             >
               SAVE NOW
             </button>

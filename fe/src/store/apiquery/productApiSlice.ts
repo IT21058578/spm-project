@@ -76,10 +76,10 @@ export const productApiSlice = createApi({
     }),
 
     uploadImages: builder.mutation({
-      query: ({ formData }) => ({
+      query: (file) => ({
         url: "/products/images",
         method: "POST",
-        body: formData,
+        body: file,
       }),
       invalidatesTags: ["Products"],
     }),
